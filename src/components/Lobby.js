@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useKey } from 'react-use';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
-import Player from '../classes/Player'; 
+import Player from '../classes/Player';
+import pallet from '../resources/pallet_town.png';
+import sprite from '../resources/spellun-sprite.png'; 
 
 // Players are identified with currentUser.uid
 
@@ -10,7 +13,7 @@ export default function Lobby() {
 
   const [players, setPlayers] = useState({});
 
-  const [myPlayer, setMyPlayer] = useState({})
+  const [myPlayer, setMyPlayer] = useState({});
 
   // refs must be used for position values can't use myPlayer values 
   // because event handlers won't change with normal variables / state variables
@@ -18,6 +21,7 @@ export default function Lobby() {
   // initial values.
   const myPosX = useRef(0);
   const myPosY = useRef(0);
+  const delta = 1;
 
   useEffect(() => {
     // on mount
@@ -31,7 +35,7 @@ export default function Lobby() {
         // within the players dictionary
         const playersObj = {
           // this is temporary realy list is taken from realtime database
-          [currentUser.uid]: new Player(currentUser.uid, 200, 200, '/TODO/')
+          [currentUser.uid]: new Player(currentUser.uid, 50, 50, sprite)
         };
 
         // get my player object with the uid of signed in user
@@ -41,23 +45,43 @@ export default function Lobby() {
           myPosY.current = playersObj[currentUser.uid].y;
 
           // initialize MyPlayer state
-          return playersObj[currentUser.uid]
+          return playersObj[currentUser.uid];
         });
 
         return playersObj;
       }
     );
 
-    // event handlers
-    document.addEventListener('keydown', (e) => {
-      // TODO: Movement by Ryo
-    });
-
     // on dismount
     return () => {
 
     };
   }, []);
+
+  // keyboard event handlers
+  const moveUp = () => {
+    myPosY.current -= delta;
+    setMyPlayer(myPlayer => myPlayer.y = myPosY.current);
+  }
+  useKey('ArrowUp', moveUp);
+
+  const moveDown = () => {
+    myPosY.current += delta;
+    setMyPlayer(myPlayer => myPlayer.y = myPosY.current);
+  }
+  useKey('ArrowDown', moveDown);
+
+  const moveRight = () => {
+    myPosX.current += delta;
+    setMyPlayer(myPlayer => myPlayer.x = myPosX.current);
+  }
+  useKey('ArrowRight', moveRight);
+
+  const moveLeft = () => {
+    myPosX.current -= delta;
+    setMyPlayer(myPlayer => myPlayer.x = myPosX.current);
+  }
+  useKey('ArrowLeft', moveLeft);
 
   useEffect(() => {
     // if something changes with myPlayer
@@ -76,11 +100,11 @@ export default function Lobby() {
       <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
       <button onClick={signOff}>SignOff</button>
       <LobbyMap>
+        <img src={pallet} alt='bg-map' />
         {
           Object.values(players).map(p => {
             // position p (player) based on Player object
-            // TODO: Fix IMG src and IMAGE DISPLAYING
-            return (<StyledAvatar key={currentUser.uid} x={p.x} y={p.y} bg={'#54B3E9'} src={'/home/kirby/Downloads/cat.jpeg'} />);
+            return (<StyledAvatar key={currentUser.uid} x={p.x} y={p.y} src={sprite} />);
           })
         }
       </LobbyMap>
@@ -96,21 +120,19 @@ const StyledMain = styled.main`
 // LobbyMap is the holder of all players
 // tiling / background images can be used here
 const LobbyMap = styled.div`
-  height: 100vh;
-  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  width: 80vh;
 `;
 
-// absolute positioning to position player based on pixels
+// absolute positioning to position player based on viewport height/width
 // using left and top
-// TODO: Add background-image for avatar 
 const StyledAvatar = styled.div`
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  box-sizing: border-box;
-  border: 5px solid black;
-  background-color: ${props => props.bg};
+  left: ${props => props.x}vw;
+  top: ${props => props.y}vh;
+  width: 7vh;
+  height: 7vh;
 `;
