@@ -6,6 +6,8 @@ import SignIn from './SignIn';
 import SignUp from './SignUp';
 
 function App() {
+  document.title = 'Proximic';
+
   const [isSignIn, setIsSignIn] = useState(true);
 
   const email = useRef("");
@@ -27,7 +29,6 @@ function App() {
 
   const formSignUp = (e) => {
     e.preventDefault();
-    console.log(pass.current.value, conpass.current);
     if (pass.current.value === conpass.current.value) {
       signUp(email.current.value, pass.current.value);
     } else {
