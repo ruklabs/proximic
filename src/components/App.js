@@ -10,6 +10,7 @@ function App() {
 
   const email = useRef("");
   const pass = useRef("");
+  const conpass = useRef("");
 
   const { currentUser, signIn, signUp } = useAuth();
 
@@ -26,7 +27,12 @@ function App() {
 
   const formSignUp = (e) => {
     e.preventDefault();
-    signUp(email.current.value, pass.current.value);
+    console.log(pass.current.value, conpass.current);
+    if (pass.current.value === conpass.current.value) {
+      signUp(email.current.value, pass.current.value);
+    } else {
+      console.log('Your passwords are not the same');
+    }
   };
 
   if (user) {
@@ -52,9 +58,9 @@ function App() {
           <label htmlFor="email">Email</label>
           <input ref={email} type="email" id="email" name="email" />
           <label htmlFor="pass">Password</label>
-          <input type="password" id="pass" name="pass" />
+          <input ref={pass} type="password" id="pass" name="pass" />
           <label htmlFor="conpass">Confirm Password</label>
-          <input ref={pass} type="password" id="conpass" name="conpass" />
+          <input ref={conpass} type="password" id="conpass" name="conpass" />
           <button onClick={formSignUp} type="button">Sign Up</button>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
         </StyledForm>
