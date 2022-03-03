@@ -143,6 +143,7 @@ const StyledMain = styled.main`
 // LobbyMap is the holder of all players
 // tiling / background images can be used here
 const LobbyMap = styled.div`
+  position: relative;
   background-color: grey;
   margin: 50px 0;
   background-color: grey;
@@ -153,7 +154,6 @@ const LobbyMap = styled.div`
 `;
 
 const StyledBackground = styled.img`
-  display: block;
   width: 100%;
 `;
 
