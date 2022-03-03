@@ -60,6 +60,7 @@ export default function Lobby() {
 
   // keyboard event handlers
   const moveUp = () => {
+    if (myPosY.current - delta < 0) return;
     myPosY.current -= delta;
 
     setMyPlayer(prevPlayer => {
@@ -67,10 +68,13 @@ export default function Lobby() {
       newPlayer.y = myPosY.current;
       return newPlayer;
     });
+
+
   }
   useKey('ArrowUp', moveUp);
 
   const moveDown = () => {
+    if (myPosY.current + delta > 90) return;
     myPosY.current += delta;
 
     setMyPlayer(prevPlayer => {
@@ -82,6 +86,7 @@ export default function Lobby() {
   useKey('ArrowDown', moveDown);
 
   const moveRight = () => {
+    if (myPosX.current + delta > 90) return;
     myPosX.current += delta;
 
     setMyPlayer(prevPlayer => {
@@ -93,6 +98,7 @@ export default function Lobby() {
   useKey('ArrowRight', moveRight);
 
   const moveLeft = () => {
+    if (myPosX.current - delta < 0) return;
     myPosX.current -= delta;
 
     setMyPlayer(prevPlayer => {
