@@ -23,9 +23,14 @@ yarn-debug.log*
 yarn-error.log*
 
 # firebase
-firebase-debug.log
-ui-debug.log
+/ui-debug.log
+/firestore-debug.log
+/database-debug.log
 /emu
 /firebase-export-1646268952069VDgooN
 /firebase-export-1646231778601dirFW4
 firebase-export-1646274727149ZGGZzZ/firestore_export/firestore_export.overall_export_metadata
+/.firebase
+
+# vim-specific
+Session.vim
