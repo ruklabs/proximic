@@ -21,7 +21,9 @@ export default function Lobby() {
   // initial values.
   const myPosX = useRef(0);
   const myPosY = useRef(0);
-  const delta = 1;
+  const DELTA = 1;
+  const BORDER_FLOOR = 0;
+  const BORDER_CEIL = 90;
 
   useEffect(() => {
     // on mount
@@ -60,8 +62,8 @@ export default function Lobby() {
 
   // keyboard event handlers
   const moveUp = () => {
-    if (myPosY.current - delta < 0) return;
-    myPosY.current -= delta;
+    if (myPosY.current - DELTA < BORDER_FLOOR) return;
+    myPosY.current -= DELTA;
 
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
@@ -74,8 +76,8 @@ export default function Lobby() {
   useKey('ArrowUp', moveUp);
 
   const moveDown = () => {
-    if (myPosY.current + delta > 90) return;
-    myPosY.current += delta;
+    if (myPosY.current + DELTA > BORDER_CEIL) return;
+    myPosY.current += DELTA;
 
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
@@ -86,8 +88,8 @@ export default function Lobby() {
   useKey('ArrowDown', moveDown);
 
   const moveRight = () => {
-    if (myPosX.current + delta > 90) return;
-    myPosX.current += delta;
+    if (myPosX.current + DELTA > BORDER_CEIL) return;
+    myPosX.current += DELTA;
 
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
@@ -98,8 +100,8 @@ export default function Lobby() {
   useKey('ArrowRight', moveRight);
 
   const moveLeft = () => {
-    if (myPosX.current - delta < 0) return;
-    myPosX.current -= delta;
+    if (myPosX.current - DELTA < BORDER_FLOOR) return;
+    myPosX.current -= DELTA;
 
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
