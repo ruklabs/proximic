@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useKey } from 'react-use';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
-import Player from '../classes/Player'; 
+import Player from '../classes/Player';
+import pallet from '../resources/pallet_town.png';
+import sprite from '../resources/spellun-sprite.png'; 
 
 // Players are identified with currentUser.uid
 
@@ -10,7 +13,7 @@ export default function Lobby() {
 
   const [players, setPlayers] = useState({});
 
-  const [myPlayer, setMyPlayer] = useState({})
+  const [myPlayer, setMyPlayer] = useState({});
 
   // refs must be used for position values can't use myPlayer values 
   // because event handlers won't change with normal variables / state variables
@@ -18,6 +21,9 @@ export default function Lobby() {
   // initial values.
   const myPosX = useRef(0);
   const myPosY = useRef(0);
+  const DELTA = 1;
+  const BORDER_FLOOR = 0;
+  const BORDER_CEIL = 90;
 
   useEffect(() => {
     // on mount
@@ -31,7 +37,7 @@ export default function Lobby() {
         // within the players dictionary
         const playersObj = {
           // this is temporary realy list is taken from realtime database
-          [currentUser.uid]: new Player(currentUser.uid, 200, 200, '/TODO/')
+          [currentUser.uid]: new Player(currentUser.uid, 50, 50, sprite)
         };
 
         // get my player object with the uid of signed in user
@@ -41,17 +47,12 @@ export default function Lobby() {
           myPosY.current = playersObj[currentUser.uid].y;
 
           // initialize MyPlayer state
-          return playersObj[currentUser.uid]
+          return playersObj[currentUser.uid];
         });
 
         return playersObj;
       }
     );
-
-    // event handlers
-    document.addEventListener('keydown', (e) => {
-      // TODO: Movement by Ryo
-    });
 
     // on dismount
     return () => {
@@ -59,11 +60,63 @@ export default function Lobby() {
     };
   }, []);
 
+  // keyboard event handlers
+  const moveUp = () => {
+    if (myPosY.current - DELTA < BORDER_FLOOR) return;
+    myPosY.current -= DELTA;
+
+    setMyPlayer(prevPlayer => {
+      const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
+      newPlayer.y = myPosY.current;
+      return newPlayer;
+    });
+
+
+  }
+  useKey('ArrowUp', moveUp);
+
+  const moveDown = () => {
+    if (myPosY.current + DELTA > BORDER_CEIL) return;
+    myPosY.current += DELTA;
+
+    setMyPlayer(prevPlayer => {
+      const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
+      newPlayer.y = myPosY.current;
+      return newPlayer;
+    });
+  }
+  useKey('ArrowDown', moveDown);
+
+  const moveRight = () => {
+    if (myPosX.current + DELTA > BORDER_CEIL) return;
+    myPosX.current += DELTA;
+
+    setMyPlayer(prevPlayer => {
+      const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
+      newPlayer.x = myPosX.current;
+      return newPlayer;
+    });
+  }
+  useKey('ArrowRight', moveRight);
+
+  const moveLeft = () => {
+    if (myPosX.current - DELTA < BORDER_FLOOR) return;
+    myPosX.current -= DELTA;
+
+    setMyPlayer(prevPlayer => {
+      const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
+      newPlayer.x = myPosX.current;
+      return newPlayer;
+    });
+  }
+  useKey('ArrowLeft', moveLeft);
+
   useEffect(() => {
     // if something changes with myPlayer
     // if myPlayer reference changes (update players dictionary) --> update entire lobby state
     setPlayers(prevPlayers => {
       const newPlayers = JSON.parse(JSON.stringify(prevPlayers));
+      console.log('myplayer>useEffect', myPlayer);
       newPlayers[currentUser.uid].x = myPlayer.x;
       newPlayers[currentUser.uid].y = myPlayer.y;
       return newPlayers;
@@ -76,11 +129,11 @@ export default function Lobby() {
       <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
       <button onClick={signOff}>SignOff</button>
       <LobbyMap>
+        <StyledBackground src={pallet} alt='bg-map' />
         {
           Object.values(players).map(p => {
             // position p (player) based on Player object
-            // TODO: Fix IMG src and IMAGE DISPLAYING
-            return (<StyledAvatar key={currentUser.uid} x={p.x} y={p.y} bg={'#54B3E9'} src={'/home/kirby/Downloads/cat.jpeg'} />);
+            return (<StyledAvatar key={currentUser.uid} x={p.x} y={p.y} src={sprite} />);
           })
         }
       </LobbyMap>
@@ -91,26 +144,33 @@ export default function Lobby() {
 const StyledMain = styled.main`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 // LobbyMap is the holder of all players
 // tiling / background images can be used here
 const LobbyMap = styled.div`
-  height: 100vh;
-  border: 1px solid black;
+  position: relative;
+  background-color: grey;
+  margin: 50px 0;
+  background-color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
 `;
 
-// absolute positioning to position player based on pixels
+const StyledBackground = styled.img`
+  width: 100%;
+`;
+
+// absolute positioning to position player based on viewport height/width
 // using left and top
-// TODO: Add background-image for avatar 
-const StyledAvatar = styled.div`
+const StyledAvatar = styled.img`
+  display: inline-block;
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  box-sizing: border-box;
-  border: 5px solid black;
-  background-color: ${props => props.bg};
+  left: ${props => props.x}%;
+  top: ${props => props.y}%;
+  max-width: 10%;
 `;
