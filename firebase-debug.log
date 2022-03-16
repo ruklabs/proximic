@@ -1,0 +1,107 @@
+[debug] [2022-03-16T02:55:15.756Z] ----------------------------------------------------------------------
+[debug] [2022-03-16T02:55:15.758Z] Command:       /usr/local/bin/node /home/kirby/.yarn/bin/firebase emulators:start --import=./emu --export-on-exit=./emu
+[debug] [2022-03-16T02:55:15.758Z] CLI Version:   10.2.1
+[debug] [2022-03-16T02:55:15.758Z] Platform:      linux
+[debug] [2022-03-16T02:55:15.759Z] Node Version:  v16.5.0
+[debug] [2022-03-16T02:55:15.761Z] Time:          Wed Mar 16 2022 10:55:15 GMT+0800 (Philippine Standard Time)
+[debug] [2022-03-16T02:55:15.761Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-03-16T02:55:15.763Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2022-03-16T02:55:15.832Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-03-16T02:55:15.833Z] > authorizing via signed-in user (192ruk.labs@gmail.com)
+[info] i  emulators: Starting emulators: auth, firestore, database, hosting, storage {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore, database, hosting, storage"}}
+[debug] [2022-03-16T02:55:15.847Z] [hub] writing locator at /tmp/hub-proximic-a2a4e.json
+[info] i  firestore: Importing data from /home/kirby/kquirapas/proximic/emu/firestore_export/firestore_export.overall_export_metadata {"metadata":{"emulator":{"name":"firestore"},"message":"Importing data from /home/kirby/kquirapas/proximic/emu/firestore_export/firestore_export.overall_export_metadata"}}
+[debug] [2022-03-16T02:55:15.912Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2022-03-16T02:55:15.912Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2022-03-16T02:55:15.913Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","/home/kirby/.cache/firebase/emulators/cloud-firestore-emulator-v1.13.1.jar","--host","localhost","--port",8080,"--seed_from_export","/home/kirby/kquirapas/proximic/emu/firestore_export/firestore_export.overall_export_metadata","--rules","/home/kirby/kquirapas/proximic/firestore.rules"],"optionalArgs":["port","webchannel_port","host","rules","functions_emulator","seed_from_export"],"joinArgs":false} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"/home/kirby/.cache/firebase/emulators/cloud-firestore-emulator-v1.13.1.jar\",\"--host\",\"localhost\",\"--port\",8080,\"--seed_from_export\",\"/home/kirby/kquirapas/proximic/emu/firestore_export/firestore_export.overall_export_metadata\",\"--rules\",\"/home/kirby/kquirapas/proximic/firestore.rules\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"functions_emulator\",\"seed_from_export\"],\"joinArgs\":false}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2022-03-16T02:55:16.561Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2022-03-16T02:55:16.562Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2022-03-16T02:55:17.243Z] Mar 16, 2022 10:55:17 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://localhost:36573
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Mar 16, 2022 10:55:17 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\nINFO: Started WebSocket server on ws://localhost:36573\n"}}
+[debug] [2022-03-16T02:55:17.306Z] API endpoint: http://localhost: {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://localhost:"}}
+[debug] [2022-03-16T02:55:17.307Z] 8080
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=localhost:8080
+
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"8080\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\n\n   export FIRESTORE_EMULATOR_HOST=localhost:8080\n\nDev App Server is now running.\n\n"}}
+[debug] [2022-03-16T02:55:17.445Z] > refreshing access token with scopes: []
+[debug] [2022-03-16T02:55:17.446Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2022-03-16T02:55:17.666Z] <<< HTTP RESPONSE 200 {"expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","date":"Wed, 16 Mar 2022 02:55:17 GMT","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","server":"scaffolding on HTTPServer2","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2022-03-16T02:55:17.691Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e [none]
+[debug] [2022-03-16T02:55:18.109Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e 200
+[debug] [2022-03-16T02:55:18.109Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e {"projectId":"proximic-a2a4e","projectNumber":"441219700403","displayName":"Proximic","name":"projects/proximic-a2a4e","resources":{"hostingSite":"proximic-a2a4e","realtimeDatabaseInstance":"proximic-a2a4e-default-rtdb","storageBucket":"proximic-a2a4e.appspot.com","locationId":"asia-southeast2"},"state":"ACTIVE"}
+[debug] [2022-03-16T02:55:18.110Z] database rules config:  [{"instance":"proximic-a2a4e-default-rtdb","rules":"/home/kirby/kquirapas/proximic/database.rules.json"}]
+[debug] [2022-03-16T02:55:18.113Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2022-03-16T02:55:18.113Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2022-03-16T02:55:18.113Z] Ignoring unsupported arg: rules {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: rules"}}
+[debug] [2022-03-16T02:55:18.113Z] Starting Database Emulator with command {"binary":"java","args":["-Duser.language=en","-jar","/home/kirby/.cache/firebase/emulators/firebase-database-emulator-v4.7.3.jar","--host","localhost","--port",9000],"optionalArgs":["port","host","functions_emulator_port","functions_emulator_host"],"joinArgs":false} {"metadata":{"emulator":{"name":"database"},"message":"Starting Database Emulator with command {\"binary\":\"java\",\"args\":[\"-Duser.language=en\",\"-jar\",\"/home/kirby/.cache/firebase/emulators/firebase-database-emulator-v4.7.3.jar\",\"--host\",\"localhost\",\"--port\",9000],\"optionalArgs\":[\"port\",\"host\",\"functions_emulator_port\",\"functions_emulator_host\"],\"joinArgs\":false}"}}
+[info] i  database: Database Emulator logging to database-debug.log {"metadata":{"emulator":{"name":"database"},"message":"Database Emulator logging to \u001b[1mdatabase-debug.log\u001b[22m"}}
+[debug] [2022-03-16T02:55:18.849Z] WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by io.netty.util.internal.ReflectionUtil (file:/home/kirby/.cache/firebase/emulators/firebase-database-emulator-v4.7.3.jar) to field sun.nio.ch.SelectorImpl.selectedKeys
+WARNING: Please consider reporting this to the maintainers of io.netty.util.internal.ReflectionUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+ {"metadata":{"emulator":{"name":"database"},"message":"WARNING: An illegal reflective access operation has occurred\nWARNING: Illegal reflective access by io.netty.util.internal.ReflectionUtil (file:/home/kirby/.cache/firebase/emulators/firebase-database-emulator-v4.7.3.jar) to field sun.nio.ch.SelectorImpl.selectedKeys\nWARNING: Please consider reporting this to the maintainers of io.netty.util.internal.ReflectionUtil\nWARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations\nWARNING: All illegal access operations will be denied in a future release\n"}}
+[debug] [2022-03-16T02:55:19.792Z] 10:55:19.790 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+ {"metadata":{"emulator":{"name":"database"},"message":"10:55:19.790 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started\n"}}
+[debug] [2022-03-16T02:55:19.981Z] 10:55:19.980 [main] INFO com.firebase.server.forge.App$ - Listening at localhost:9000
+ {"metadata":{"emulator":{"name":"database"},"message":"10:55:19.980 [main] INFO com.firebase.server.forge.App$ - Listening at localhost:9000\n"}}
+[info] i  database: Importing data from /home/kirby/kquirapas/proximic/emu/database_export/proximic-a2a4e-default-rtdb.json {"metadata":{"emulator":{"name":"database"},"message":"Importing data from /home/kirby/kquirapas/proximic/emu/database_export/proximic-a2a4e-default-rtdb.json"}}
+[info] i  auth: Importing config from /home/kirby/kquirapas/proximic/emu/auth_export/config.json {"metadata":{"emulator":{"name":"database"},"message":"Importing config from /home/kirby/kquirapas/proximic/emu/auth_export/config.json"}}
+[info] i  auth: Importing accounts from /home/kirby/kquirapas/proximic/emu/auth_export/accounts.json {"metadata":{"emulator":{"name":"database"},"message":"Importing accounts from /home/kirby/kquirapas/proximic/emu/auth_export/accounts.json"}}
+[debug] [2022-03-16T02:55:27.650Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"storage"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2022-03-16T02:55:27.863Z] Temp file directory for storage emulator: /tmp/firebase/storage/blobs {"metadata":{"emulator":{"name":"storage"},"message":"Temp file directory for storage emulator: /tmp/firebase/storage/blobs"}}
+[debug] [2022-03-16T02:55:28.573Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/proximic-a2a4e/sites 
+[debug] [2022-03-16T02:55:29.862Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/proximic-a2a4e/sites 200
+[debug] [2022-03-16T02:55:29.862Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/proximic-a2a4e/sites {"sites":[{"name":"projects/441219700403/sites/proximic-a2a4e","defaultUrl":"https://proximic-a2a4e.web.app","appId":"1:441219700403:web:6f4a76cad5dc079e1942c6","type":"DEFAULT_SITE"}]}
+[debug] [2022-03-16T02:55:29.863Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e/webApps/1:441219700403:web:6f4a76cad5dc079e1942c6/config [none]
+[debug] [2022-03-16T02:55:31.299Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e/webApps/1:441219700403:web:6f4a76cad5dc079e1942c6/config 200
+[debug] [2022-03-16T02:55:31.300Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/proximic-a2a4e/webApps/1:441219700403:web:6f4a76cad5dc079e1942c6/config {"projectId":"proximic-a2a4e","appId":"1:441219700403:web:6f4a76cad5dc079e1942c6","databaseURL":"https://proximic-a2a4e-default-rtdb.asia-southeast1.firebasedatabase.app","storageBucket":"proximic-a2a4e.appspot.com","locationId":"asia-southeast2","apiKey":"AIzaSyAOlEKjqZobAgEsOgGjyPlhWt3rQV9lbOE","authDomain":"proximic-a2a4e.firebaseapp.com","messagingSenderId":"441219700403"}
+[info] i  hosting: Serving hosting files from: build {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mbuild\u001b[22m"}}
+[info] ✔  hosting: Local server: http://localhost:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://localhost:5000\u001b[22m\u001b[24m"}}
+[debug] [2022-03-16T02:55:31.323Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2022-03-16T02:55:31.324Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2022-03-16T02:55:31.324Z] Starting Emulator UI with command {"binary":"node","args":["/home/kirby/.cache/firebase/emulators/ui-v1.6.5/server.bundle.js"],"optionalArgs":[],"joinArgs":false} {"metadata":{"emulator":{"name":"ui"},"message":"Starting Emulator UI with command {\"binary\":\"node\",\"args\":[\"/home/kirby/.cache/firebase/emulators/ui-v1.6.5/server.bundle.js\"],\"optionalArgs\":[],\"joinArgs\":false}"}}
+[info] i  ui: Emulator UI logging to ui-debug.log {"metadata":{"emulator":{"name":"ui"},"message":"Emulator UI logging to \u001b[1mui-debug.log\u001b[22m"}}
+[debug] [2022-03-16T02:55:31.430Z] Web / API server started at localhost:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at localhost:4000\n"}}
+[debug] [2022-03-16T02:55:31.591Z] >>> HTTP REQUEST PUT http://localhost:9000/.settings/rules.json?ns=proximic-a2a4e-default-rtdb  
+ {
+  "rules": {
+    ".read": "now < 1648137600000",  // 2022-3-25
+    ".write": "now < 1648137600000",  // 2022-3-25
+  }
+}
+
+[debug] [2022-03-16T02:55:31.711Z] <<< HTTP RESPONSE 200 {"content-length":"15","content-type":"application/json; charset=utf-8","access-control-allow-origin":"*","cache-control":"no-cache","x-firebase-project-id":"proximic-a2a4e-default-rtdb","x-firebase-project-number":"123456789","x-firebase-uuid":"5560c5e0-cde7-4920-91e4-b99dbbd477e8"}
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://localhost:4000                │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ localhost:9099 │ http://localhost:4000/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ localhost:8080 │ http://localhost:4000/firestore │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Database       │ localhost:9000 │ http://localhost:4000/database  │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Hosting        │ localhost:5000 │ n/a                             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Storage        │ localhost:9199 │ http://localhost:4000/storage   │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub running at localhost:4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

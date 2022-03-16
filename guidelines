@@ -1,0 +1,14 @@
+Work Tree
+
+
+Every time a component is created it must be capitalized and place in its own folder.
+
+For example, a new Button component will have this directory structure
+
+in ./src/components create a folder called 'Button'
+
+/Button
+	/__test__
+		Button.test.js
+	Button.js
+	Button.css

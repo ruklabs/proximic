@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { useKey } from 'react-use';
 import styled from 'styled-components';
 
-import { useAuth } from '../contexts/AuthContext';
-import Player from '../classes/Player';
+import { useAuth } from '../../contexts/AuthContext';
+import Player from '../../classes/Player';
 import { getDatabase, ref, set, onValue  } from 'firebase/database';
-import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../endpoints';
+import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
-import pallet from '../resources/pallet_town.png';
-import sprite from '../resources/spellun-sprite.png'; 
+import pallet from '../../resources/pallet_town.png';
+import sprite from '../../resources/spellun-sprite.png'; 
 
 const DELTA = 1;
 const BORDER_FLOOR = 0;

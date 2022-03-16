@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 
-import { useAuth } from '../contexts/AuthContext';
-import Lobby from './Lobby';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
+import { useAuth } from '../../contexts/AuthContext';
+import Lobby from '../Lobby/Lobby';
+import SignIn from '../SignIn/SignIn';
+import SignUp from '../SignUp/SignUp';
 
 function App() {
   document.title = 'Proximic';
