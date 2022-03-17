@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Player from '../../classes/Player';
 import Sprite from '../../classes/Sprite';
 import pallet from '../../resources/pallet_town.png';
-import sprite from '../../resources/spellun-sprite.png'; 
 import leftside from '../../resources/leftside.png'; 
 import rightside from '../../resources/rightside.png';
 import downside from '../../resources/down.png';
@@ -36,7 +35,7 @@ export default function Lobby() {
 
   useEffect(() => {
     // on mount
-    const p = new Player('temporary_username', 50, 50, sprite);
+    const p = new Player('temporary_username', 50, 50, downside);
 
     enterLobby(currentUser.uid, p);
 

@@ -9,7 +9,6 @@ import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import { useAuth } from '../../contexts/AuthContext';
 
-import pallet from '../../resources/pallet_town.png';
 import bluebg from '../../resources/bg.png'; 
 import logo from '../../resources/logo.png';
 import signin_img from '../../resources/sign-in-img.jpg';
