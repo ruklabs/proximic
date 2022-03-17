@@ -3,8 +3,12 @@ import { useKey } from 'react-use';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import Player from '../classes/Player';
+import Sprite from '../classes/Sprite';
 import pallet from '../resources/pallet_town.png';
-import sprite from '../resources/spellun-sprite.png'; 
+import leftside from '../resources/leftside.png'; 
+import rightside from '../resources/rightside.png';
+import downside from '../resources/down.png';
+import upside from '../resources/up.png';
 
 // Players are identified with currentUser.uid
 
@@ -37,7 +41,7 @@ export default function Lobby() {
         // within the players dictionary
         const playersObj = {
           // this is temporary realy list is taken from realtime database
-          [currentUser.uid]: new Player(currentUser.uid, 50, 50, sprite)
+          [currentUser.uid]: new Player(currentUser.uid, 50, 50, downside)
         };
 
         // get my player object with the uid of signed in user
@@ -68,10 +72,9 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
+      newPlayer.avatar = upside;
       return newPlayer;
     });
-
-
   }
   useKey('ArrowUp', moveUp);
 
@@ -82,6 +85,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
+      newPlayer.avatar = downside;
       return newPlayer;
     });
   }
@@ -94,6 +98,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
+      newPlayer.avatar = rightside;
       return newPlayer;
     });
   }
@@ -106,6 +111,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
+      newPlayer.avatar = leftside;
       return newPlayer;
     });
   }
@@ -119,6 +125,7 @@ export default function Lobby() {
       console.log('myplayer>useEffect', myPlayer);
       newPlayers[currentUser.uid].x = myPlayer.x;
       newPlayers[currentUser.uid].y = myPlayer.y;
+      newPlayers[currentUser.uid].avatar = myPlayer.avatar;
       return newPlayers;
     });
   }, [myPlayer]);
@@ -133,7 +140,11 @@ export default function Lobby() {
         {
           Object.values(players).map(p => {
             // position p (player) based on Player object
-            return (<StyledAvatar key={currentUser.uid} x={p.x} y={p.y} src={sprite} />);
+            return (
+              <StyledAvatar key={currentUser.uid} x={p.x} y={p.y}> 
+                <Sprite src={p.avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
+              </StyledAvatar>
+            );
           })
         }
       </LobbyMap>
@@ -167,7 +178,7 @@ const StyledBackground = styled.img`
 
 // absolute positioning to position player based on viewport height/width
 // using left and top
-const StyledAvatar = styled.img`
+const StyledAvatar = styled.div`
   display: inline-block;
   position: absolute;
   left: ${props => props.x}%;

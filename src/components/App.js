@@ -1,9 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { TextField, Button } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import styled from 'styled-components';
 import Lobby from './Lobby';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import './App.css';
+import pallet from '../resources/pallet_town.png';
+import bluebg from '../resources/bg.png'; 
+import logo from '../resources/logo.png';
+import signin_img from '../resources/sign-in-img.jpg';
+import signup_img from '../resources/sign-up-img.jpg';
+
+
 
 function App() {
   document.title = 'Proximic';
@@ -41,28 +51,48 @@ function App() {
     return <Lobby />
   } else {
     if (isSignIn) return (
-      <SignIn>
-        <StyledForm action="">
-          <label htmlFor="email">Email</label>
-          <input ref={email} type="email" id="email" name="email" />
-          <label htmlFor="pass">Password</label>
-          <input ref={pass} type="password" id="pass" name="pass" />
-          <button onClick={formSignIn} type="button">Sign In</button>
-          <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
-        </StyledForm>
-      </SignIn>
+        <SignIn>
+          <StyledForm action="">
+            <div className='header-box'>
+              <div className='header'>
+                <img src={logo}/>
+                <h1>PROXIMIC</h1>
+              </div>
+              <p>Real-life conversations online</p>
+            </div>
+            <div className='field-input'>
+              <label htmlFor="email">E-mail</label>
+              <ProxiTextField required inputRef={email} type="email" id="email" label="E-mail" variant="filled" />
+            </div>
+            <div className='field-input'>
+              <label htmlFor="pass">Password</label>
+              <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
+            </div>
+            <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
+            <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
+          </StyledForm>
+          <img className='main-image' src={signin_img} />
+        </SignIn>
     );
 
     return (
       <SignUp>
+        <img className='main-image' src={signup_img} />
         <StyledForm action="">
-          <label htmlFor="email">Email</label>
-          <input ref={email} type="email" id="email" name="email" />
-          <label htmlFor="pass">Password</label>
-          <input ref={pass} type="password" id="pass" name="pass" />
-          <label htmlFor="conpass">Confirm Password</label>
-          <input ref={conpass} type="password" id="conpass" name="conpass" />
-          <button onClick={formSignUp} type="button">Sign Up</button>
+          <h1>SIGN UP</h1>
+          <div className='field-input'>
+            <label htmlFor="email">E-mail</label>
+            <ProxiTextField required inputRef={email} type="email" id="email" label="E-mail" variant="filled" />
+          </div>
+          <div className='field-input'>
+            <label htmlFor="pass">Password</label>
+            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
+          </div>
+          <div className='field-input'>
+            <label htmlFor="conpass">Confirm Password</label>
+            <ProxiTextField required inputRef={conpass} type="password" id="conpass" label="Confirm Password" variant="filled" />
+          </div>
+          <ProxiButton onClick={formSignUp} type="button" variant="contained" >Sign Up</ProxiButton>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
         </StyledForm>
       </SignUp>
@@ -73,15 +103,55 @@ function App() {
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 56px;
+  width: 50%;
+  background-image: url('${bluebg}');
 `;
 
 const StyledLink = styled.a`
-  color: blue;
+  margin: 0 auto;
+  color: #DB8536;
+  text-align: center;
   
   &:hover {
     text-decoration: underline;
     cursor: pointer;
   }
 `;
+
+const ProxiTextField = styled(TextField)({
+  '& label.Mui-focused': {
+    color: '#DB8536',
+  },
+  '& .css-cio0x1-MuiInputBase-root-MuiFilledInput-root:after': {
+    borderBottomColor: '#DB8536',
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#DB8536',
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: '#FFFFFF',
+    },
+    '&:hover fieldset': {
+      borderColor: '#FFFFFF',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#DB8536',
+    },
+  },
+});
+
+const ProxiButton = withStyles({
+  root: {
+    color: '#FFFFFF',
+    backgroundColor: '#DB8536',
+    '&:hover': {
+      backgroundColor: '#ffffff',
+      color: '#DB8536',
+  },
+}})(Button);
 
 export default App;

@@ -1,7 +1,7 @@
 
 export default function SignUp({ children }) {
   return (
-    <div>
+    <div className="sign-up">
       { children }
     </div>
   );
