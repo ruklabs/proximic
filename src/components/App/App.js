@@ -1,19 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState, useRef, useEffect, useContext } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { TextField, Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import styled from 'styled-components';
-import Lobby from './Lobby';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
+import Lobby from '../Lobby/Lobby';
+import SignIn from '../SignIn/SignIn';
+import SignUp from '../SignUp/SignUp';
 import './App.css';
-import pallet from '../resources/pallet_town.png';
-import bluebg from '../resources/bg.png'; 
-import logo from '../resources/logo.png';
-import signin_img from '../resources/sign-in-img.jpg';
-import signup_img from '../resources/sign-up-img.jpg';
-
-
+import bluebg from '../../resources/bg.png'; 
+import logo from '../../resources/logo.png';
+import signin_img from '../../resources/sign-in-img.jpg';
+import signup_img from '../../resources/sign-up-img.jpg';
 
 function App() {
   document.title = 'Proximic';
@@ -21,12 +18,11 @@ function App() {
   const [isSignIn, setIsSignIn] = useState(true);
 
   const email = useRef("");
+  const username = useRef("");
   const pass = useRef("");
   const conpass = useRef("");
 
-  const { currentUser, signIn, signUp } = useAuth();
-
-  const user = currentUser;
+  const { currentUser, signIn, signUp, signOff } = useAuth();
 
   useEffect(() => {
     // on mount
@@ -39,40 +35,60 @@ function App() {
 
   const formSignUp = (e) => {
     e.preventDefault();
+
+    if (pass.current.value === '' || conpass.current.value === '') return;
+
     if (pass.current.value === conpass.current.value) {
-      signUp(email.current.value, pass.current.value);
+      signUp(email.current.value, username.current.value, pass.current.value);
+
     } else {
       console.log('Your passwords are not the same');
     }
   };
 
-  if (user) {
+  const formSignOff = (e) => {
+    e.preventDefault();
+    signOff();
+  };
+
+  if (currentUser) {
     // Done signing in
-    return <Lobby />
+    // const username = getUsername(currentUser.uid).then(e => e);
+    return (
+      <main>
+        <aside>
+          <p>Welcome, user id: { currentUser.uid }</p>
+          <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
+          <button type="button" onClick={formSignOff}>Sign Out</button>
+        </aside>
+
+        <Lobby />
+      </main>
+    )
   } else {
     if (isSignIn) return (
-        <SignIn>
-          <StyledForm action="">
-            <div className='header-box'>
-              <div className='header'>
-                <img src={logo}/>
-                <h1>PROXIMIC</h1>
-              </div>
-              <p>Real-life conversations online</p>
+      <SignIn>
+        <StyledForm action="">
+          <div className='header-box'>
+            <div className='header'>
+              <img src={logo}/>
+              <h1>PROXIMIC</h1>
             </div>
-            <div className='field-input'>
-              <label htmlFor="email">E-mail</label>
-              <ProxiTextField required inputRef={email} type="email" id="email" label="E-mail" variant="filled" />
-            </div>
-            <div className='field-input'>
-              <label htmlFor="pass">Password</label>
-              <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
-            </div>
-            <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
-            <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
-          </StyledForm>
-          <img className='main-image' src={signin_img} />
-        </SignIn>
+            <p>Real-life conversations online</p>
+          </div>
+          <div className='field-input'>
+            <label htmlFor="email">E-mail</label>
+            <ProxiTextField required inputRef={email} type="email" id="email" label="E-mail" variant="filled" />
+          </div>
+          <div className='field-input'>
+            <label htmlFor="pass">Password</label>
+            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
+          </div>
+          <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
+          <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
+        </StyledForm>
+        <img className='main-image' src={signin_img} />
+      </SignIn>
     );
 
     return (

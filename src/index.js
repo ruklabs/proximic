@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from './components/App';
-import './components/App.css';
+import App from './components/App/App';
+import './components/App/App.css';
 import { AuthProvider } from './contexts/AuthContext';
 
 ReactDOM.render(

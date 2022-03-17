@@ -1,68 +1,70 @@
 import { useState, useRef, useEffect } from 'react';
 import { useKey } from 'react-use';
-import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
-import Player from '../classes/Player';
-import Sprite from '../classes/Sprite';
-import pallet from '../resources/pallet_town.png';
-import leftside from '../resources/leftside.png'; 
-import rightside from '../resources/rightside.png';
-import downside from '../resources/down.png';
-import upside from '../resources/up.png';
+import Sprite from '../../classes/Sprite';
+import pallet from '../../resources/pallet_town.png';
+import leftside from '../../resources/leftside.png'; 
+import rightside from '../../resources/rightside.png';
+import downside from '../../resources/down.png';
+import upside from '../../resources/up.png';
+import { useAuth } from '../../contexts/AuthContext';
+import Player from '../../classes/Player';
+import { getDatabase, ref, set, onValue  } from 'firebase/database';
+import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
-// Players are identified with currentUser.uid
+const DELTA = 1;
+const BORDER_FLOOR = 0;
+const BORDER_CEIL = 90;
 
 export default function Lobby() {
-  const { currentUser, signOff } = useAuth();
-
+  const { currentUser } = useAuth();
   const [players, setPlayers] = useState({});
-
   const [myPlayer, setMyPlayer] = useState({});
 
   // refs must be used for position values can't use myPlayer values 
   // because event handlers won't change with normal variables / state variables
   // because they will be in a closure and always use their
   // initial values.
+  const entered = useRef(false);
   const myPosX = useRef(0);
   const myPosY = useRef(0);
-  const DELTA = 1;
-  const BORDER_FLOOR = 0;
-  const BORDER_CEIL = 90;
 
   useEffect(() => {
     // on mount
+    const p = new Player('temporary_username', 50, 50, downside);
 
-    // value initializations
-    // TODO: use account name for Player name
-    // TODO: link firestore and storage
-    // TODO: eventually get dictionary of players from realtime database and sync state across users in lobby
-    setPlayers(() => {
-        // players are 'keyed' with uid (from firebase/auth)
-        // within the players dictionary
-        const playersObj = {
-          // this is temporary realy list is taken from realtime database
-          [currentUser.uid]: new Player(currentUser.uid, 50, 50, downside)
-        };
+    enterLobby(currentUser.uid, p);
 
-        // get my player object with the uid of signed in user
-        setMyPlayer(() => {
-          // initialize myPosX, myPosY references
-          myPosX.current = playersObj[currentUser.uid].x;
-          myPosY.current = playersObj[currentUser.uid].y;
+    getLobby()
+      .then(playersObj => {
+        setPlayers(playersObj);
+        setMyPlayer(playersObj[currentUser.uid]);
 
-          // initialize MyPlayer state
-          return playersObj[currentUser.uid];
-        });
+        // initialize myPosX, myPosY references
+        myPosX.current = playersObj[currentUser.uid].x;
+        myPosY.current = playersObj[currentUser.uid].y;
+      })
+      .catch(err => {
+        console.error('In mounting', err);
+      });
 
-        return playersObj;
-      }
-    );
+    // sync lobby
+    onValue(ref(getDatabase(), 'lobby/'), snapshot => {
+      const data = snapshot.val();
+      setPlayers(data);
+    });
 
     // on dismount
     return () => {
-
+      exitLobby(currentUser.uid);
     };
   }, []);
+
+
+  useEffect(() => {
+    updatePlayer(currentUser.uid, myPlayer);
+  }, [myPlayer]);
+
 
   // keyboard event handlers
   const moveUp = () => {
@@ -132,17 +134,14 @@ export default function Lobby() {
 
   return (
     <StyledMain>
-      <p>Welcome, user id: { currentUser.uid }</p>
-      <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
-      <button onClick={signOff}>SignOff</button>
       <LobbyMap>
         <StyledBackground src={pallet} alt='bg-map' />
         {
-          Object.values(players).map(p => {
+          Object.keys(players).map(k => {
             // position p (player) based on Player object
             return (
-              <StyledAvatar key={currentUser.uid} x={p.x} y={p.y}> 
-                <Sprite src={p.avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
+              <StyledAvatar key={k} x={players[k].x} y={players[k].y}> 
+                <Sprite src={k.avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
               </StyledAvatar>
             );
           })
@@ -151,6 +150,8 @@ export default function Lobby() {
     </StyledMain>
   );
 }
+
+// TODO: Migrate all css rules to css file
 
 const StyledMain = styled.main`
   display: flex;

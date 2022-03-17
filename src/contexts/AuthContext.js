@@ -10,6 +10,8 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 
+import { writeUserData, getUsername } from '../endpoints';
+
 
 export const AuthContext = createContext(null);
 
@@ -22,16 +24,22 @@ export function AuthProvider({ children }) {
 
   async function signIn(email, pass) {
     try {
-      await signInWithEmailAndPassword(auth,  email, pass); console.log('Signed in');
+      await signInWithEmailAndPassword(auth, email, pass);
+      console.log('Signed in');
     } catch (err) {
       console.log("Sign in failed: ", err);
     }
   }
 
-  async function signUp(email, pass) {
+  async function signUp(email, username, pass) {
     try {
       await createUserWithEmailAndPassword(auth, email, pass);
-      sendEmailVerification(auth.currentUser);
+
+      // update user credentials on database
+      const user = auth.currentUser;
+      writeUserData(user.uid, username, user.email);
+
+      sendEmailVerification(user);
       console.log('Email verification sent');
     } catch (err) {
       console.log('Sign up failed:', err);
