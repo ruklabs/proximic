@@ -17,7 +17,8 @@
     "react-scripts": "5.0.0",
     "react-use": "^17.3.2",
     "styled-components": "^5.3.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webrtc": "^1.14.1"
   },
   "scripts": {
     "start": "react-scripts start",
