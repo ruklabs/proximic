@@ -111,6 +111,7 @@ Example: endpoints.js, firebase.js, config files, etc.
 #### Ryosuke Nakano
 - Error / Prompt Message System
 	- Para modular and loosely coupled yung messaging system
+- UI Completion
 #### Uriel Negrido
 - Clean codebase while keeping functionalities intact
 	- Make sure that all conventions are kept and make changes as needed
