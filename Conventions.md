@@ -96,6 +96,9 @@ Example: endpoints.js, firebase.js, config files, etc.
 - 3 sprints left (3, 4, 5)
 
 ### Backlog
+- UI Completion
+- WebRTC integration
+- Voicechat Implementation
 - Mute voice chat implementation
 - Proximity voice chat implementation
 - Announcement mode voice chat implementation
@@ -108,7 +111,6 @@ Example: endpoints.js, firebase.js, config files, etc.
 #### Ryosuke Nakano
 - Error / Prompt Message System
 	- Para modular and loosely coupled yung messaging system
-- UI Completion
 #### Uriel Negrido
 - Clean codebase while keeping functionalities intact
 	- Make sure that all conventions are kept and make changes as needed
@@ -118,5 +120,3 @@ Example: endpoints.js, firebase.js, config files, etc.
 	- This must align with Ryo's animation system
 #### Kristian Quirapas
 - Backend Completion
-- WebRTC integration
-- Voicechat Implementation
