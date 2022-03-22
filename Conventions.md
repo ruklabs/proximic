@@ -96,7 +96,6 @@ Example: endpoints.js, firebase.js, config files, etc.
 - 3 sprints left (3, 4, 5)
 
 ### Backlog
-- UI Completion
 - WebRTC integration
 - Voicechat Implementation
 - Mute voice chat implementation
