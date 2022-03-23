@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { TextField, Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import styled from 'styled-components';
-import '../App.css';
+import './App.css';
 
 import Lobby from '../Lobby/Lobby';
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
+import ProxiAlert from '../Alert/ProxiAlert';
 import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
@@ -15,11 +16,11 @@ import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
 
 
-
 function App() {
   document.title = 'Proximic';
 
   const [isSignIn, setIsSignIn] = useState(true);
+  const [alertAttrib, setAlertAttrib] = useState({isAlert: false, msg: "", alertType: ""});
 
   const email = useRef("");
   const username = useRef("");
@@ -36,6 +37,28 @@ function App() {
     e.preventDefault();
     signIn(email.current.value, pass.current.value);
   };
+
+  const testAlert = () => {
+    setAlertAttrib(prev => {
+      const newAlert = JSON.parse(JSON.stringify(prev));
+      newAlert.isAlert = true;
+      newAlert.msg = "alert test!";
+      newAlert.alertType = "error";
+      return newAlert;
+    });
+  }
+
+  const closeAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertAttrib(prev => {
+      const newAlert = JSON.parse(JSON.stringify(prev));
+      newAlert.isAlert = false;
+      return newAlert;
+    });
+  }
 
   const formSignUp = (e) => {
     e.preventDefault();
@@ -70,6 +93,7 @@ function App() {
       </main>
     )
   } else {
+    // TODO: Remove ProxiAlert and 'Text Alert' button after testing
     if (isSignIn) return (
         <SignIn>
           <StyledForm action="">
@@ -90,8 +114,10 @@ function App() {
             </div>
             <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
             <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
+            <ProxiButton onClick={testAlert} type="button" variant="contained" >Alert Test</ProxiButton>
           </StyledForm>
           <img className='main-image' src={signin_img} />
+          <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
         </SignIn>
     );
 
@@ -115,6 +141,7 @@ function App() {
           <ProxiButton onClick={formSignUp} type="button" variant="contained" >Sign Up</ProxiButton>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
         </StyledForm>
+        <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
       </SignUp>
     );
   }
