@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
   }
 
   async function signUp(email, username, pass) {
+    console.log('signing up', email, username, pass);
     try {
       await createUserWithEmailAndPassword(auth, email, pass);
 
