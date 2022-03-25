@@ -24,7 +24,7 @@ const BORDER_CEIL = 90;
 export default function Lobby() {
 
   const { currentUser } = useAuth();
-  const username = useRef('');
+  const [username, setUsername] = useState('');
 
   const [players, setPlayers] = useState({});
   const [myPlayer, setMyPlayer] = useState({});
@@ -43,7 +43,8 @@ export default function Lobby() {
     enterLobby(currentUser.uid, p);
     getUsername(currentUser.uid)
       .then(uname => {
-        username.current = uname;
+        console.log('setting username');
+        setUsername(uname);
       })
       .catch(err => {
         console.error('In mounting', err);
@@ -139,9 +140,9 @@ export default function Lobby() {
     });
   }
   useKey('ArrowLeft', moveLeft);
-
+  
   // only render game when assets are already loaded
-  if (!currentUser.uid || !players || !username.current) {
+  if (!currentUser.uid || !players || !username) {
     return (
       <StyledMain>
         <LobbyMap>
@@ -161,7 +162,9 @@ export default function Lobby() {
             return (
               <StyledAvatar key={k} x={players[k].x} y={players[k].y} zIndex={players[k].y}> 
                 <Sprite src={players[k].avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
-                <p>{username.current}</p>
+                <span>
+                  <p>{'@' + username}</p>
+                </span>
               </StyledAvatar>
             );
           })
@@ -198,6 +201,8 @@ const StyledBackground = styled.img`
 
 // absolute positioning to position player based on viewport height/width
 // using left and top
+
+// username styling is temporary and may be modified as needed by the frontend engineer (Ryo)
 const StyledAvatar = styled.div`
   display: inline-block;
   position: absolute;
@@ -205,4 +210,15 @@ const StyledAvatar = styled.div`
   left: ${props => props.x}%;
   top: ${props => props.y}%;
   max-width: 10%;
+
+  span {
+    position: absolute;
+    top: -20px;
+    
+    p {
+      font-size: 16px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+  }
 `;
