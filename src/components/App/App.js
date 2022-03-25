@@ -12,8 +12,11 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
 import logo from '../../resources/logo.png';
+import sprite_logo from '../../resources/sprite-icon.png';
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
+import deafen_icon from '../../resources/icon_deafen.png';
+import mute_icon from '../../resources/icon_mute.png';
 
 
 function App() {
@@ -84,12 +87,17 @@ function App() {
     return (
       <main>
         <aside>
-          <p>Welcome, user id: { currentUser.uid }</p>
+          <img className="sprite-logo" src={sprite_logo}/>
+          <p>{ currentUser.uid }</p>
           <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
-          <button type="button" onClick={formSignOff}>Sign Out</button>
+          <div className="audio-control">
+            <img src={mute_icon} />
+            <img src={deafen_icon} />
+          </div>
+          <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
         </aside>
 
-        <Lobby />
+        <Lobby className="lobby"/>
       </main>
     )
   } else {
