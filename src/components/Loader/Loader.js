@@ -31,11 +31,12 @@ const wave = keyframes`
 
 const StyledDiv = styled.div`
   span {
+    font-size: 12px;
     color: white;
     position: relative;
     background-color: #DB8536;
     margin: 0 5px;
-    padding: 10px;
+    padding: 5px;
     border-radius: 20px;
     animation-name: ${wave};
     animation-duration: 1s;

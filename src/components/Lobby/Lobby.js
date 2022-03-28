@@ -140,6 +140,7 @@ export default function Lobby() {
     });
   }
   useKey('ArrowLeft', moveLeft);
+
   
   // only render game when assets are already loaded
   if (!currentUser.uid || !players || !username) {
