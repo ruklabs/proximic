@@ -11,6 +11,13 @@ import downside from '../../resources/down.png';
 import upside from '../../resources/up.png';
 
 
+import leftside2 from '../../resources/leftside-2.png'; 
+import rightside2 from '../../resources/rightside-2.png';
+import downside2 from '../../resources/down-2.png';
+import upside2 from '../../resources/up-2.png';
+
+
+
 import { useAuth } from '../../contexts/AuthContext';
 import { getDatabase, ref, set, onValue  } from 'firebase/database';
 import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
@@ -20,10 +27,21 @@ const DELTA = 1;
 const BORDER_FLOOR = 0;
 const BORDER_CEIL = 90;
 
-export default function Lobby() {
+export default function Lobby(props) {
+  
   const { currentUser } = useAuth();
   const [players, setPlayers] = useState({});
   const [myPlayer, setMyPlayer] = useState({});
+
+  const rightSprites = [rightside, rightside2];
+  const leftSprites = [leftside, leftside2];
+  const upSprites = [upside, upside2];
+  const downSprites = [downside, downside2];
+
+  const curRightSide = rightSprites[props.sprite];
+  const curLeftSide = leftSprites[props.sprite];
+  const curUpSide = upSprites[props.sprite];
+  const curDownSide = downSprites[props.sprite];
 
   // refs must be used for position values can't use myPlayer values 
   // because event handlers won't change with normal variables / state variables
@@ -35,7 +53,7 @@ export default function Lobby() {
 
   useEffect(() => {
     // on mount
-    const p = new Player('temporary_username', 50, 50, downside);
+    const p = new Player('temporary_username', 50, 50, curDownSide);
 
     enterLobby(currentUser.uid, p);
 
@@ -78,7 +96,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
-      newPlayer.avatar = upside;
+      newPlayer.avatar = curUpSide;
       return newPlayer;
     });
   }
@@ -91,7 +109,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
-      newPlayer.avatar = downside;
+      newPlayer.avatar = curDownSide;
       return newPlayer;
     });
   }
@@ -104,7 +122,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
-      newPlayer.avatar = rightside;
+      newPlayer.avatar = curRightSide;
       return newPlayer;
     });
   }
@@ -117,7 +135,7 @@ export default function Lobby() {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
-      newPlayer.avatar = leftside;
+      newPlayer.avatar = curLeftSide;
       return newPlayer;
     });
   }

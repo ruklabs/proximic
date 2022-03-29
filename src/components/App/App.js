@@ -13,6 +13,7 @@ import bluebg from '../../resources/bg.png';
 import logo from '../../resources/logo.png';
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
+import ChangeAvatar from '../ChangeAvatar/ChangeAvatar';
 
 
 
@@ -32,9 +33,14 @@ function App() {
     // on mount
   }, []);
 
+  const [curSprite, setCurSprite] = useState(0);
+  const [changeAvatar, setChangeAvatar] = useState(true);
+
   const formSignIn = (e) => {
     e.preventDefault();
     signIn(email.current.value, pass.current.value);
+
+    setChangeAvatar(true);
   };
 
   const formSignUp = (e) => {
@@ -50,25 +56,41 @@ function App() {
     }
   };
 
+
+
   const formSignOff = (e) => {
     e.preventDefault();
     signOff();
   };
 
+
+  const changeAvatarClicked2 = (e) => {
+    setChangeAvatar(false);
+  };
+
+
   if (currentUser) {
     // Done signing in
     // const username = getUsername(currentUser.uid).then(e => e);
-    return (
-      <main>
-        <aside>
-          <p>Welcome, user id: { currentUser.uid }</p>
-          <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
-          <button type="button" onClick={formSignOff}>Sign Out</button>
-        </aside>
-
-        <Lobby />
-      </main>
-    )
+    if (changeAvatar) {
+      return (
+        <ChangeAvatar onClick={changeAvatarClicked2} passChildData={setCurSprite}/>
+      );
+    }
+    if(!changeAvatar)
+    {
+      return (
+        <main>
+          <aside>
+            <p>Welcome, user id: { currentUser.uid }</p>
+            <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
+            <button type="button" onClick={formSignOff}>Sign Out</button>
+          </aside>
+  
+          <Lobby sprite={typeof(curSprite) !== "undefined" ? curSprite : 0}/>
+        </main>
+      )
+    }
   } else {
     if (isSignIn) return (
         <SignIn>
