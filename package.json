@@ -1,5 +1,5 @@
 {
-  "name": "prox",
+  "name": "proximic",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -49,5 +49,9 @@
     "jest": "^27.5.1",
     "jest-dom": "^4.0.0",
     "react-test-render": "^1.1.2"
-  }
+  },
+  "main": "index.js",
+  "repository": "git@github.com:ruklabs/proximic.git",
+  "author": "Kristian Quirapas <kmquirapas@gmail.com>",
+  "license": "MIT"
 }

@@ -10,7 +10,7 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 
-import { writeUserData, getUsername } from '../endpoints';
+import { writeUserData } from '../endpoints';
 
 
 export const AuthContext = createContext(null);

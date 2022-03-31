@@ -11,16 +11,13 @@ import rightside from '../../resources/rightside.png';
 import downside from '../../resources/down.png';
 import upside from '../../resources/up.png';
 
-
 import leftside2 from '../../resources/leftside-2.png'; 
 import rightside2 from '../../resources/rightside-2.png';
 import downside2 from '../../resources/down-2.png';
 import upside2 from '../../resources/up-2.png';
 
-
-
 import { useAuth } from '../../contexts/AuthContext';
-import { getDatabase, ref, set, onValue  } from 'firebase/database';
+import { getDatabase, ref, onValue  } from 'firebase/database';
 import { signal, enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
 

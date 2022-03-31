@@ -8,6 +8,7 @@ import Lobby from '../Lobby/Lobby';
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import ProxiAlert from '../Alert/ProxiAlert';
+import ChangeAvatar from '../ChangeAvatar/ChangeAvatar';
 import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
@@ -16,7 +17,6 @@ import sprite_logo from '../../resources/sprite-icon.png';
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
 
-import ChangeAvatar from '../ChangeAvatar/ChangeAvatar';
 import deafen_icon from '../../resources/icon_deafen.png';
 import mute_icon from '../../resources/icon_mute.png';
 
