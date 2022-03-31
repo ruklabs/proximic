@@ -15,6 +15,8 @@ import logo from '../../resources/logo.png';
 import sprite_logo from '../../resources/sprite-icon.png';
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
+
+import ChangeAvatar from '../ChangeAvatar/ChangeAvatar';
 import deafen_icon from '../../resources/icon_deafen.png';
 import mute_icon from '../../resources/icon_mute.png';
 
@@ -36,9 +38,14 @@ function App() {
     // on mount
   }, []);
 
+  const [curSprite, setCurSprite] = useState(0);
+  const [changeAvatar, setChangeAvatar] = useState(true);
+
   const formSignIn = (e) => {
     e.preventDefault();
     signIn(email.current.value, pass.current.value);
+
+    setChangeAvatar(true);
   };
 
   const testAlert = () => {
@@ -76,15 +83,31 @@ function App() {
     }
   };
 
+
+
   const formSignOff = (e) => {
     e.preventDefault();
     signOff();
   };
 
+
+  const changeAvatarClicked2 = (e) => {
+    setChangeAvatar(false);
+  };
+
+
   if (currentUser) {
     // Done signing in
     // const username = getUsername(currentUser.uid).then(e => e);
-    return (
+
+    if (changeAvatar) {
+      return (
+        <ChangeAvatar onClick={changeAvatarClicked2} passChildData={setCurSprite}/>
+      );
+    }
+    if(!changeAvatar)
+    {
+      return (
       <main>
         <aside>
           <img className="sprite-logo" src={sprite_logo}/>
@@ -97,9 +120,10 @@ function App() {
           <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
         </aside>
 
-        <Lobby className="lobby"/>
+        <Lobby className="lobby" sprite={typeof(curSprite) !== "undefined" ? curSprite : 0} />
       </main>
-    )
+      )
+    }
   } else {
     // TODO: Remove ProxiAlert and 'Text Alert' button after testing
     if (isSignIn) return (
