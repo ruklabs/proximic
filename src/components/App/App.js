@@ -98,7 +98,6 @@ function App() {
 
   if (currentUser) {
     // Done signing in
-    // const username = getUsername(currentUser.uid).then(e => e);
 
     if (changeAvatar) {
       return (
