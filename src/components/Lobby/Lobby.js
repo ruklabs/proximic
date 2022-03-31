@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useKey } from 'react-use';
 import styled from 'styled-components';
 
+import Loader from '../Loader/Loader';
 import Player from '../../classes/Player';
 import Sprite from '../../classes/Sprite';
 import pallet from '../../resources/pallet_town.png';
@@ -20,7 +21,7 @@ import upside2 from '../../resources/up-2.png';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { getDatabase, ref, set, onValue  } from 'firebase/database';
-import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
+import { signal, enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
 
 const DELTA = 1;
@@ -28,8 +29,9 @@ const BORDER_FLOOR = 0;
 const BORDER_CEIL = 90;
 
 export default function Lobby(props) {
-  
   const { currentUser } = useAuth();
+  const [username, setUsername] = useState('');
+
   const [players, setPlayers] = useState({});
   const [myPlayer, setMyPlayer] = useState({});
 
@@ -47,7 +49,6 @@ export default function Lobby(props) {
   // because event handlers won't change with normal variables / state variables
   // because they will be in a closure and always use their
   // initial values.
-  const entered = useRef(false);
   const myPosX = useRef(0);
   const myPosY = useRef(0);
 
@@ -56,6 +57,14 @@ export default function Lobby(props) {
     const p = new Player('temporary_username', 50, 50, curDownSide);
 
     enterLobby(currentUser.uid, p);
+    getUsername(currentUser.uid)
+      .then(uname => {
+        console.log('setting username');
+        setUsername(uname);
+      })
+      .catch(err => {
+        console.error('In mounting', err);
+      });
 
     getLobby()
       .then(playersObj => {
@@ -75,9 +84,16 @@ export default function Lobby(props) {
       const data = snapshot.val();
       setPlayers(data);
     });
+    
+    // makes sure that no instance of the player is left in the lobby database on exit
+    window.addEventListener('beforeunload', e => {
+      console.log('cleaning before unload');
+      exitLobby(currentUser.uid);
+    });
 
     // on dismount
     return () => {
+      console.log('cleaning up');
       exitLobby(currentUser.uid);
     };
   }, []);
@@ -141,6 +157,17 @@ export default function Lobby(props) {
   }
   useKey('ArrowLeft', moveLeft);
 
+  
+  // only render game when assets are already loaded
+  if (!currentUser.uid || !players || !username) {
+    return (
+      <StyledMain>
+        <LobbyMap>
+          <Loader />
+        </LobbyMap>
+      </StyledMain>
+    );
+  }
 
   return (
     <StyledMain>
@@ -150,8 +177,11 @@ export default function Lobby(props) {
           Object.keys(players).map(k => {
             // position p (player) based on Player object
             return (
-              <StyledAvatar key={currentUser.uid} x={players[k].x} y={players[k].y}> 
+              <StyledAvatar key={k} x={players[k].x} y={players[k].y} zIndex={players[k].y}> 
                 <Sprite src={players[k].avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
+                <span>
+                  <p>{'@' + username}</p>
+                </span>
               </StyledAvatar>
             );
           })
@@ -174,13 +204,12 @@ const StyledMain = styled.main`
 // tiling / background images can be used here
 const LobbyMap = styled.div`
   position: relative;
-  background-color: grey;
   margin: 50px 0;
-  background-color: grey;
   display: flex;
   justify-content: center;
   align-items: center;
   max-width: 800px;
+  min-height: 50vh;
 `;
 
 const StyledBackground = styled.img`
@@ -189,10 +218,24 @@ const StyledBackground = styled.img`
 
 // absolute positioning to position player based on viewport height/width
 // using left and top
+
+// username styling is temporary and may be modified as needed by the frontend engineer (Ryo)
 const StyledAvatar = styled.div`
   display: inline-block;
   position: absolute;
+  z-index: ${props => props.zIndex};
   left: ${props => props.x}%;
   top: ${props => props.y}%;
   max-width: 10%;
+
+  span {
+    position: absolute;
+    top: -20px;
+    
+    p {
+      font-size: 16px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+  }
 `;

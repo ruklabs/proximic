@@ -163,6 +163,10 @@ function App() {
             <ProxiTextField required inputRef={email} type="email" id="email" label="E-mail" variant="filled" />
           </div>
           <div className='field-input'>
+            <label htmlFor="username">Username</label>
+            <ProxiTextField required inputRef={username} type="text" id="username" label="Username" variant="filled" />
+          </div>
+          <div className='field-input'>
             <label htmlFor="pass">Password</label>
             <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
           </div>

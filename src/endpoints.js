@@ -9,21 +9,18 @@ export function writeUserData(userId, username, email) {
 }
 
 export async function getUsername(userId) {
-  // console.log('getting username');
-  // const dbRef = ref(getDatabase());
-  //
-  // try {
-  //   const response = await get(child(dbRef, `users/${userId}`))
-  //   console.log(response);
-  //   if (response.exists()) {
-  //     return response.val().username;
-  //   }
-  //
-  //   console.log('no username');
-  //   return null;
-  // } catch (err) {
-  //   console.error(err);
-  // }
+  try {
+    const dbRef = ref(getDatabase());
+    const response = await get(child(dbRef, `users/${userId}`));
+    if (response.exists()) {
+      return response.val().username;
+    }
+
+    console.log('no username');
+    return null;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export async function enterLobby(userId, initialplayer) {
@@ -63,4 +60,9 @@ export function exitLobby(userId) {
   // removes user from lobby upon leave
   const db = getDatabase();
   remove(ref(db, `lobby/${userId}`));
+}
+
+export function signal() {
+  const db = getDatabase();
+  set(ref(db, `ItsWorking/`), true);
 }

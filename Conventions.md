@@ -95,7 +95,8 @@ Example: endpoints.js, firebase.js, config files, etc.
 ### Overview
 - 3 sprints left (3, 4, 5)
 
-### Backlog
+### Backlogs
+- Make animation speed consistent among devices
 - WebRTC integration
 - Voicechat Implementation
 - Mute voice chat implementation
