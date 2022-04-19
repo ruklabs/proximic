@@ -16,12 +16,13 @@ export async function getUsername(userId) {
       return response.val().username;
     }
 
-    console.log('no username');
+    console.log('No username');
     return null;
   } catch (err) {
     console.error(err);
   }
 }
+
 
 export async function enterLobby(userId, initialplayer) {
   // adds the user to the current lobby state

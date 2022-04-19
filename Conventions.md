@@ -88,15 +88,15 @@ Example: endpoints.js, firebase.js, config files, etc.
 - This means <u>it pays to be early para wala kang isesettle na merge conflicts</u> since FIFO tayo sa pag push sa `main` branch
 
 
-
-
-
-# Sprint #3 Specifications
 ### Overview
 - 3 sprints left (3, 4, 5)
 
 ### Backlogs
-- Make animation speed consistent among devices
+- Make UI more dynamic and interactive (mute button) etc. 
+- Test App and open issues on github
+- Resolve frontend issues (if any)
+- Randomize sprite selection
+- Get consistent assets (sprites and maps) and apply to codebase
 - WebRTC integration
 - Voicechat Implementation
 - Mute voice chat implementation
@@ -121,3 +121,50 @@ Example: endpoints.js, firebase.js, config files, etc.
 	- This must align with Ryo's animation system
 #### Kristian Quirapas
 - Backend Completion
+
+
+
+### Sprint #4 Delegation
+
+### Kamustahan session muna 
+
+### Main Goal (Complete Application, no more changes on next sprint other than testing ang bug fixes)
+- monday to friday (sprint to the max)
+- saturday sunday (code review)
+- next week mon - wed (code refactor based on code reviews)
+- thursday merging
+- friday sprint assessment
+
+#### Sprint #4 Personal Goals
+
+#### Ryosuke Nakano
+- Do proper form validation (check if email, or password, etc. then add necessary alerts)
+- Make UI more dynamic and interactive (mute button) etc. 
+
+- Test App and open issues on github
+- Resolve frontend issues (if any)
+
+#### Uriel Negrido
+- Make sprite selection randomized
+- Get consistent assets (sprites and maps) and apply to codebase
+
+- Test App and open issues on github
+
+#### Kristian Quirapas
+- resolve same username for user bug
+- Test App and open issues on github
+- WebRTC integration
+- Voicechat Implementation
+- Mute voice chat implementation
+- Proximity voice chat implementation
+- Announcement mode voice chat implementation
+
+
+Kristian
+-tapusin agad
+
+Ryo
+-wala naman
+
+Uri
+-di malate / makasabay

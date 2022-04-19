@@ -27,7 +27,6 @@ const BORDER_CEIL = 90;
 
 export default function Lobby(props) {
   const { currentUser } = useAuth();
-  const [username, setUsername] = useState('');
 
   const [players, setPlayers] = useState({});
   const [myPlayer, setMyPlayer] = useState({});
@@ -51,26 +50,24 @@ export default function Lobby(props) {
 
   useEffect(() => {
     // on mount
-    const p = new Player('temporary_username', 50, 50, curDownSide);
 
-    enterLobby(currentUser.uid, p);
     getUsername(currentUser.uid)
       .then(uname => {
-        console.log('setting username');
-        setUsername(uname);
-      })
-      .catch(err => {
-        console.error('In mounting', err);
-      });
+        const p = new Player(uname, 50, 50, curDownSide);
+        enterLobby(currentUser.uid, p);
 
-    getLobby()
-      .then(playersObj => {
-        setPlayers(playersObj);
-        setMyPlayer(playersObj[currentUser.uid]);
+        getLobby()
+          .then(playersObj => {
+            setPlayers(playersObj);
+            setMyPlayer(playersObj[currentUser.uid]);
 
-        // initialize myPosX, myPosY references
-        myPosX.current = playersObj[currentUser.uid].x;
-        myPosY.current = playersObj[currentUser.uid].y;
+            // initialize myPosX, myPosY references
+            myPosX.current = playersObj[currentUser.uid].x;
+            myPosY.current = playersObj[currentUser.uid].y;
+          })
+          .catch(err => {
+            console.error('In mounting', err);
+          });
       })
       .catch(err => {
         console.error('In mounting', err);
@@ -84,13 +81,13 @@ export default function Lobby(props) {
     
     // makes sure that no instance of the player is left in the lobby database on exit
     window.addEventListener('beforeunload', e => {
-      console.log('cleaning before unload');
+      console.log('Cleaning before unload');
       exitLobby(currentUser.uid);
     });
 
     // on dismount
     return () => {
-      console.log('cleaning up');
+      console.log('Cleaning up');
       exitLobby(currentUser.uid);
     };
   }, []);
@@ -156,7 +153,7 @@ export default function Lobby(props) {
 
   
   // only render game when assets are already loaded
-  if (!currentUser.uid || !players || !username) {
+  if (!currentUser.uid || !players) {
     return (
       <StyledMain>
         <LobbyMap>
@@ -177,7 +174,7 @@ export default function Lobby(props) {
               <StyledAvatar key={k} x={players[k].x} y={players[k].y} zIndex={players[k].y}> 
                 <Sprite src={players[k].avatar} states={4} tile={{ width: 20, height: 24 }} scale={2} framesPerStep={8} />
                 <span>
-                  <p>{'@' + username}</p>
+                  <p>{'@' + players[k].name}</p>
                 </span>
               </StyledAvatar>
             );
