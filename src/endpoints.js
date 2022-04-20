@@ -1,4 +1,5 @@
 import { getDatabase, ref, set, update, remove, get, child } from 'firebase/database';
+import { database } from './firebase';
 
 export function writeUserData(userId, username, email) {
   const db = getDatabase();

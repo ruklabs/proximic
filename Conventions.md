@@ -158,6 +158,7 @@ Example: endpoints.js, firebase.js, config files, etc.
 - Mute voice chat implementation
 - Proximity voice chat implementation
 - Announcement mode voice chat implementation
+- change getDatabase() in endpoints fo database from firebase.js
 
 
 Kristian
