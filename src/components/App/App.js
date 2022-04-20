@@ -26,6 +26,8 @@ function App() {
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [alertAttrib, setAlertAttrib] = useState({isAlert: false, msg: "", alertType: ""});
+  const [passValid, setPassValid] = useState({isValid: true, errText: ""});
+  const [conPassValid, setConPassValid] = useState({isValid: true, errText: ""});
 
   const email = useRef("");
   const username = useRef("");
@@ -43,20 +45,22 @@ function App() {
 
   const formSignIn = (e) => {
     e.preventDefault();
-    signIn(email.current.value, pass.current.value);
+    (async () => {
+      let result = await signIn(email.current.value, pass.current.value);
+
+      if (!result) {
+        setAlertAttrib(prev => {
+          const newAlert = JSON.parse(JSON.stringify(prev));
+          newAlert.isAlert = true;
+          newAlert.msg = "Invalid email and/or password!";
+          newAlert.alertType = "error";
+          return newAlert;
+        });
+      }
+    })()
 
     setChangeAvatar(true);
   };
-
-  const testAlert = () => {
-    setAlertAttrib(prev => {
-      const newAlert = JSON.parse(JSON.stringify(prev));
-      newAlert.isAlert = true;
-      newAlert.msg = "alert test!";
-      newAlert.alertType = "error";
-      return newAlert;
-    });
-  }
 
   const closeAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -75,11 +79,40 @@ function App() {
 
     if (pass.current.value === '' || conpass.current.value === '') return;
 
+    if (pass.current.value.length >= 6) {
+      setPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = true;
+        newFormValid.errText = "";
+        return newFormValid;
+      });
+    } else {
+      setPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = false;
+        newFormValid.errText = "Password must have more than 6 characters.";
+        return newFormValid;
+      });
+    }
+
     if (pass.current.value === conpass.current.value) {
+      setConPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = true;
+        newFormValid.errText = "";
+        return newFormValid;
+      });
+
       signUp(email.current.value, username.current.value, pass.current.value);
 
     } else {
       console.log('Your passwords are not the same');
+      setConPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = false;
+        newFormValid.errText = "Passwords do not match.";
+        return newFormValid;
+      });
     }
   };
 
@@ -124,7 +157,6 @@ function App() {
       )
     }
   } else {
-    // TODO: Remove ProxiAlert and 'Text Alert' button after testing
     if (isSignIn) return (
         <SignIn>
           <StyledForm action="">
@@ -145,7 +177,6 @@ function App() {
             </div>
             <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
             <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
-            <ProxiButton onClick={testAlert} type="button" variant="contained" >Alert Test</ProxiButton>
           </StyledForm>
           <img className='main-image' src={signin_img} />
           <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
@@ -167,11 +198,13 @@ function App() {
           </div>
           <div className='field-input'>
             <label htmlFor="pass">Password</label>
-            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
+            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" 
+            error={!passValid.isValid} helperText={passValid.errText} />
           </div>
           <div className='field-input'>
             <label htmlFor="conpass">Confirm Password</label>
-            <ProxiTextField required inputRef={conpass} type="password" id="conpass" label="Confirm Password" variant="filled" />
+            <ProxiTextField required inputRef={conpass} type="password" id="conpass" label="Confirm Password" variant="filled" 
+              error={!conPassValid.isValid} helperText={conPassValid.errText} />
           </div>
           <ProxiButton onClick={formSignUp} type="button" variant="contained" >Sign Up</ProxiButton>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
