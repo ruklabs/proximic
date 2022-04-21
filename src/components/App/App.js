@@ -13,21 +13,25 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
 import logo from '../../resources/logo.png';
-import sprite_logo from '../../resources/sprite-icon.png';
+import sprite_logo1 from '../../resources/sprite-icon.png';
+import sprite_logo2 from '../../resources/sprite-icon2.png';
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
 
 import deafen_icon from '../../resources/icon_deafen.png';
 import mute_icon from '../../resources/icon_mute.png';
 
-
 function App() {
   document.title = 'Proximic';
+
+  const spriteLogos = [sprite_logo1, sprite_logo2]
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [alertAttrib, setAlertAttrib] = useState({isAlert: false, msg: "", alertType: ""});
   const [passValid, setPassValid] = useState({isValid: true, errText: ""});
   const [conPassValid, setConPassValid] = useState({isValid: true, errText: ""});
+  const [isMuted, setIsMuted] = useState(false);
+  const [isDeafened, setIsDeafened] = useState(false);
 
   const email = useRef("");
   const username = useRef("");
@@ -62,17 +66,6 @@ function App() {
     setChangeAvatar(true);
   };
 
-  const closeAlert = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setAlertAttrib(prev => {
-      const newAlert = JSON.parse(JSON.stringify(prev));
-      newAlert.isAlert = false;
-      return newAlert;
-    });
-  }
 
   const formSignUp = (e) => {
     e.preventDefault();
@@ -116,8 +109,6 @@ function App() {
     }
   };
 
-
-
   const formSignOff = (e) => {
     e.preventDefault();
     signOff();
@@ -127,6 +118,20 @@ function App() {
   const changeAvatarClicked2 = (e) => {
     setChangeAvatar(false);
   };
+
+  const muteVolume = () => {
+    // Place backend interface function for muting here
+    setIsMuted(prev => {
+      return !prev;
+    });
+  }
+
+  const deafenSound = () => {
+    // Place backend interface function for deafening here
+    setIsDeafened(prev => {
+      return !prev;
+    });
+  }
 
 
   if (currentUser) {
@@ -142,12 +147,12 @@ function App() {
       return (
       <main>
         <aside>
-          <img className="sprite-logo" src={sprite_logo}/>
+          <img className="sprite-logo" src={spriteLogos[curSprite]}/>
           <p>{ currentUser.uid }</p>
           <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
           <div className="audio-control">
-            <img src={mute_icon} />
-            <img src={deafen_icon} />
+            <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+            <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
           </div>
           <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
         </aside>
@@ -179,7 +184,7 @@ function App() {
             <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
           </StyledForm>
           <img className='main-image' src={signin_img} />
-          <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
+          <ProxiAlert attrib={alertAttrib} setClose={setAlertAttrib}/>
         </SignIn>
     );
 
@@ -209,7 +214,7 @@ function App() {
           <ProxiButton onClick={formSignUp} type="button" variant="contained" >Sign Up</ProxiButton>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
         </StyledForm>
-        <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
+        <ProxiAlert attrib={alertAttrib} setClose={setAlertAttrib}/>
       </SignUp>
     );
   }
