@@ -16,6 +16,18 @@ import rightside2 from '../../resources/rightside-2.png';
 import downside2 from '../../resources/down-2.png';
 import upside2 from '../../resources/up-2.png';
 
+
+import upside3 from '../../resources/up-3.png';
+import upside4 from '../../resources/up-4.png';
+import downside3 from '../../resources/down-3.png';
+import downside4 from '../../resources/down-4.png';
+
+
+import leftside3 from '../../resources/leftside-3.png'; 
+import rightside3 from '../../resources/rightside-3.png';
+import leftside4 from '../../resources/leftside-4.png'; 
+import rightside4 from '../../resources/rightside-4.png';
+
 import { useAuth } from '../../contexts/AuthContext';
 import { getDatabase, ref, onValue  } from 'firebase/database';
 import { signal, enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
@@ -31,15 +43,10 @@ export default function Lobby(props) {
   const [players, setPlayers] = useState({});
   const [myPlayer, setMyPlayer] = useState({});
 
-  const rightSprites = [rightside, rightside2];
-  const leftSprites = [leftside, leftside2];
-  const upSprites = [upside, upside2];
-  const downSprites = [downside, downside2];
-
-  const curRightSide = rightSprites[props.sprite];
-  const curLeftSide = leftSprites[props.sprite];
-  const curUpSide = upSprites[props.sprite];
-  const curDownSide = downSprites[props.sprite];
+  const rightSprites = [rightside, rightside2, rightside3, rightside4];
+  const leftSprites = [leftside, leftside2, leftside3, leftside4];
+  const upSprites = [upside, upside2, upside3, upside4];
+  const downSprites = [downside, downside2, downside3, downside4];
 
   // refs must be used for position values can't use myPlayer values 
   // because event handlers won't change with normal variables / state variables
@@ -53,7 +60,7 @@ export default function Lobby(props) {
 
     getUsername(currentUser.uid)
       .then(uname => {
-        const p = new Player(uname, 50, 50, curDownSide);
+        const p = new Player(uname, 50, 50, downSprites[props.sprite]);
         enterLobby(currentUser.uid, p);
 
         getLobby()
@@ -106,7 +113,7 @@ export default function Lobby(props) {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
-      newPlayer.avatar = curUpSide;
+      newPlayer.avatar = upSprites[props.sprite];
       return newPlayer;
     });
   }
@@ -119,7 +126,7 @@ export default function Lobby(props) {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.y = myPosY.current;
-      newPlayer.avatar = curDownSide;
+      newPlayer.avatar = downSprites[props.sprite];
       return newPlayer;
     });
   }
@@ -132,7 +139,7 @@ export default function Lobby(props) {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
-      newPlayer.avatar = curRightSide;
+      newPlayer.avatar = rightSprites[props.sprite];
       return newPlayer;
     });
   }
@@ -145,7 +152,7 @@ export default function Lobby(props) {
     setMyPlayer(prevPlayer => {
       const newPlayer = JSON.parse(JSON.stringify(prevPlayer));
       newPlayer.x = myPosX.current;
-      newPlayer.avatar = curLeftSide;
+      newPlayer.avatar = leftSprites[props.sprite];
       return newPlayer;
     });
   }

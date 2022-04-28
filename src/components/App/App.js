@@ -8,23 +8,27 @@ import Lobby from '../Lobby/Lobby';
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import ProxiAlert from '../Alert/ProxiAlert';
-import ChangeAvatar from '../ChangeAvatar/ChangeAvatar';
 import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
 import logo from '../../resources/logo.png';
-import sprite_logo1 from '../../resources/sprite-icon.png';
-import sprite_logo2 from '../../resources/sprite-icon2.png';
+
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
 
 import deafen_icon from '../../resources/icon_deafen.png';
 import mute_icon from '../../resources/icon_mute.png';
 
+
+import sprite from '../../resources/sprite.gif';
+import sprite2 from '../../resources/sprite2.gif';
+import sprite3 from '../../resources/sprite3.gif';
+import sprite4 from '../../resources/sprite4.gif';
+
+const sprites = [sprite, sprite2, sprite3, sprite4];
+
 function App() {
   document.title = 'Proximic';
-
-  const spriteLogos = [sprite_logo1, sprite_logo2]
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [alertAttrib, setAlertAttrib] = useState({isAlert: false, msg: "", alertType: ""});
@@ -44,9 +48,6 @@ function App() {
     // on mount
   }, []);
 
-  const [curSprite, setCurSprite] = useState(0);
-  const [changeAvatar, setChangeAvatar] = useState(true);
-
   const formSignIn = (e) => {
     e.preventDefault();
     (async () => {
@@ -62,8 +63,6 @@ function App() {
         });
       }
     })()
-
-    setChangeAvatar(true);
   };
 
 
@@ -115,10 +114,8 @@ function App() {
   };
 
 
-  const changeAvatarClicked2 = (e) => {
-    setChangeAvatar(false);
-  };
-
+  const spriteSelect = Math.floor((Math.random() * 4));
+    
   const muteVolume = () => {
     // Place backend interface function for muting here
     setIsMuted(prev => {
@@ -135,19 +132,10 @@ function App() {
 
 
   if (currentUser) {
-    // Done signing in
-
-    if (changeAvatar) {
-      return (
-        <ChangeAvatar onClick={changeAvatarClicked2} passChildData={setCurSprite}/>
-      );
-    }
-    if(!changeAvatar)
-    {
       return (
       <main>
         <aside>
-          <img className="sprite-logo" src={spriteLogos[curSprite]}/>
+          <img className="sprite-logo" src={sprites[spriteSelect]}/>
           <p>{ currentUser.uid }</p>
           <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
           <div className="audio-control">
@@ -157,10 +145,9 @@ function App() {
           <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
         </aside>
 
-        <Lobby className="lobby" sprite={typeof(curSprite) !== "undefined" ? curSprite : 0} />
+        <Lobby className="lobby" sprite={spriteSelect} />
       </main>
       )
-    }
   } else {
     if (isSignIn) return (
         <SignIn>
