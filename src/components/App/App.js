@@ -26,6 +26,7 @@ import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
+const spriteSelect = Math.floor((Math.random() * 4));
 
 function App() {
   document.title = 'Proximic';
@@ -114,7 +115,7 @@ function App() {
   };
 
 
-  const spriteSelect = Math.floor((Math.random() * 4));
+  
     
   const muteVolume = () => {
     // Place backend interface function for muting here
@@ -132,22 +133,22 @@ function App() {
 
 
   if (currentUser) {
-      return (
-      <main>
-        <aside>
-          <img className="sprite-logo" src={sprites[spriteSelect]}/>
-          <p>{ currentUser.uid }</p>
-          <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
-          <div className="audio-control">
-            <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
-            <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
-          </div>
-          <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
-        </aside>
+    return (
+    <main>
+      <aside>
+        <img className="sprite-logo" src={sprites[spriteSelect]}/>
+        <p>{ currentUser.uid }</p>
+        <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
+        <div className="audio-control">
+          <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+          <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+        </div>
+        <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
+      </aside>
 
-        <Lobby className="lobby" sprite={spriteSelect} />
-      </main>
-      )
+      <Lobby className="lobby" sprite={spriteSelect} />
+    </main>
+    )
   } else {
     if (isSignIn) return (
         <SignIn>
