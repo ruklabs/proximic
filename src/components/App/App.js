@@ -12,11 +12,13 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import bluebg from '../../resources/bg.png'; 
 import logo from '../../resources/logo.png';
+
 import signin_img from '../../resources/sign-in-img.jpg';
 import signup_img from '../../resources/sign-up-img.jpg';
 
 import deafen_icon from '../../resources/icon_deafen.png';
 import mute_icon from '../../resources/icon_mute.png';
+
 
 import sprite from '../../resources/sprite.gif';
 import sprite2 from '../../resources/sprite2.gif';
@@ -30,6 +32,10 @@ function App() {
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [alertAttrib, setAlertAttrib] = useState({isAlert: false, msg: "", alertType: ""});
+  const [passValid, setPassValid] = useState({isValid: true, errText: ""});
+  const [conPassValid, setConPassValid] = useState({isValid: true, errText: ""});
+  const [isMuted, setIsMuted] = useState(false);
+  const [isDeafened, setIsDeafened] = useState(false);
 
   const email = useRef("");
   const username = useRef("");
@@ -44,45 +50,63 @@ function App() {
 
   const formSignIn = (e) => {
     e.preventDefault();
-    signIn(email.current.value, pass.current.value);
+    (async () => {
+      let result = await signIn(email.current.value, pass.current.value);
+
+      if (!result) {
+        setAlertAttrib(prev => {
+          const newAlert = JSON.parse(JSON.stringify(prev));
+          newAlert.isAlert = true;
+          newAlert.msg = "Invalid email and/or password!";
+          newAlert.alertType = "error";
+          return newAlert;
+        });
+      }
+    })()
   };
 
-  const testAlert = () => {
-    setAlertAttrib(prev => {
-      const newAlert = JSON.parse(JSON.stringify(prev));
-      newAlert.isAlert = true;
-      newAlert.msg = "alert test!";
-      newAlert.alertType = "error";
-      return newAlert;
-    });
-  }
-
-  const closeAlert = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setAlertAttrib(prev => {
-      const newAlert = JSON.parse(JSON.stringify(prev));
-      newAlert.isAlert = false;
-      return newAlert;
-    });
-  }
 
   const formSignUp = (e) => {
     e.preventDefault();
 
     if (pass.current.value === '' || conpass.current.value === '') return;
 
+    if (pass.current.value.length >= 6) {
+      setPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = true;
+        newFormValid.errText = "";
+        return newFormValid;
+      });
+    } else {
+      setPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = false;
+        newFormValid.errText = "Password must have more than 6 characters.";
+        return newFormValid;
+      });
+    }
+
     if (pass.current.value === conpass.current.value) {
+      setConPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = true;
+        newFormValid.errText = "";
+        return newFormValid;
+      });
+
       signUp(email.current.value, username.current.value, pass.current.value);
 
     } else {
       console.log('Your passwords are not the same');
+      setConPassValid(prev => {
+        const newFormValid = JSON.parse(JSON.stringify(prev));
+        newFormValid.isValid = false;
+        newFormValid.errText = "Passwords do not match.";
+        return newFormValid;
+      });
     }
   };
-
-
 
   const formSignOff = (e) => {
     e.preventDefault();
@@ -91,27 +115,40 @@ function App() {
 
 
   const spriteSelect = Math.floor((Math.random() * 4));
+    
+  const muteVolume = () => {
+    // Place backend interface function for muting here
+    setIsMuted(prev => {
+      return !prev;
+    });
+  }
+
+  const deafenSound = () => {
+    // Place backend interface function for deafening here
+    setIsDeafened(prev => {
+      return !prev;
+    });
+  }
+
 
   if (currentUser) {
-    // Done signing in
-    return (
-    <main>
-      <aside>
-        <img className="sprite-logo" src={sprites[spriteSelect]}/>
-        <p>{ currentUser.uid }</p>
-        <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
-        <div className="audio-control">
-          <img src={mute_icon} />
-          <img src={deafen_icon} />
-        </div>
-        <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
-      </aside>
+      return (
+      <main>
+        <aside>
+          <img className="sprite-logo" src={sprites[spriteSelect]}/>
+          <p>{ currentUser.uid }</p>
+          <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
+          <div className="audio-control">
+            <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+            <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+          </div>
+          <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
+        </aside>
 
-      <Lobby className="lobby" sprite={spriteSelect} />
-    </main>
-    )
+        <Lobby className="lobby" sprite={spriteSelect} />
+      </main>
+      )
   } else {
-    // TODO: Remove ProxiAlert and 'Text Alert' button after testing
     if (isSignIn) return (
         <SignIn>
           <StyledForm action="">
@@ -132,10 +169,9 @@ function App() {
             </div>
             <ProxiButton onClick={formSignIn} type="button" variant="contained" >Sign In</ProxiButton>
             <StyledLink onClick={() => { setIsSignIn(false) }}>Don't have an account?</StyledLink>
-            <ProxiButton onClick={testAlert} type="button" variant="contained" >Alert Test</ProxiButton>
           </StyledForm>
           <img className='main-image' src={signin_img} />
-          <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
+          <ProxiAlert attrib={alertAttrib} setClose={setAlertAttrib}/>
         </SignIn>
     );
 
@@ -154,16 +190,18 @@ function App() {
           </div>
           <div className='field-input'>
             <label htmlFor="pass">Password</label>
-            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" />
+            <ProxiTextField required inputRef={pass} type="password" id="password" label="Password" variant="filled" 
+            error={!passValid.isValid} helperText={passValid.errText} />
           </div>
           <div className='field-input'>
             <label htmlFor="conpass">Confirm Password</label>
-            <ProxiTextField required inputRef={conpass} type="password" id="conpass" label="Confirm Password" variant="filled" />
+            <ProxiTextField required inputRef={conpass} type="password" id="conpass" label="Confirm Password" variant="filled" 
+              error={!conPassValid.isValid} helperText={conPassValid.errText} />
           </div>
           <ProxiButton onClick={formSignUp} type="button" variant="contained" >Sign Up</ProxiButton>
           <StyledLink onClick={() => { setIsSignIn(true) }} >Already have an account?</StyledLink>
         </StyledForm>
-        <ProxiAlert open={alertAttrib.isAlert} message={alertAttrib.msg} type={alertAttrib.alertType} onClose={closeAlert}/>
+        <ProxiAlert attrib={alertAttrib} setClose={setAlertAttrib}/>
       </SignUp>
     );
   }
