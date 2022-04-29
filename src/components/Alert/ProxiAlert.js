@@ -10,11 +10,23 @@ const Alert = forwardRef(function Alert(props, ref) {
 // To use, just set alert attributes in parent function and an onClose handler
 export default function ProxiAlert(props) {
 
+    const closeAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        props.setClose(prev => {
+          const newAlert = JSON.parse(JSON.stringify(prev));
+          newAlert.isAlert = false;
+          return newAlert;
+        });
+      }
+
     return(
-        <Snackbar open={props.open} autoHideDuration={5000} onClose={props.onClose} 
+        <Snackbar open={props.attrib.isAlert} autoHideDuration={5000} onClose={closeAlert} 
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }} >
-            <Alert onClose={props.onClose} severity={props.type} sx={{ width: '100%' }}>
-                {props.message}
+            <Alert onClose={closeAlert} severity={props.attrib.alertType} sx={{ width: '100%' }}>
+                {props.attrib.msg}
             </Alert>
         </Snackbar>
     );

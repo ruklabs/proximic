@@ -26,8 +26,10 @@ export function AuthProvider({ children }) {
     try {
       await signInWithEmailAndPassword(auth, email, pass);
       console.log('Signed in');
+      return true;
     } catch (err) {
       console.log("Sign in failed: ", err);
+      return false;
     }
   }
 
