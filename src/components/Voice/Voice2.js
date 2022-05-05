@@ -17,16 +17,59 @@ const answers = '/session/answers'
 
 const iceCandidates = '/session/ice'
 
-const config = { iceServers: [{
+const config = {
+  iceServers: [
+    {
       urls: [
         "stun1.l.google.com:19302",
         "stun2.l.google.com:19302",
         "stun3.l.google.com:19302",
         "stun4.l.google.com:19302"
       ]
-  }],
-  iceCandidatePoolSize: 10
+    },
+    {
+      urls: "stun:openrelay.metered.ca:80",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443?transport=tcp",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+  ], 
 };
+
+// const config = {
+//   iceServers: [
+//     {
+//       urls: "stun:openrelay.metered.ca:80",
+//     },
+//     {
+//       urls: "turn:openrelay.metered.ca:80",
+//       username: "openrelayproject",
+//       credential: "openrelayproject",
+//     },
+//     {
+//       urls: "turn:openrelay.metered.ca:443",
+//       username: "openrelayproject",
+//       credential: "openrelayproject",
+//     },
+//     {
+//       urls: "turn:openrelay.metered.ca:443?transport=tcp",
+//       username: "openrelayproject",
+//       credential: "openrelayproject",
+//     },
+//   ],
+// };
 
 const offerPC = new RTCPeerConnection([config]);
 const answerPC = new RTCPeerConnection([config]);
@@ -70,12 +113,41 @@ function setData(path, data) {
 }
 
 
+// Component
 export default function Voice2() {
   const [called, setCalled] = useState(false);
   const [answered, setAnswered] = useState(false);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     // on mounting
+    
+    // session cleanup before new session
+    removeData(session);
+  
+    // OFFER TRACKS
+    (async () => {
+      try {
+        const localStream = await navigator.mediaDevices.getUserMedia({
+          audio: true
+        });
+        console.log('adding tracks');
+
+        localStream.getTracks().forEach(track => {
+          offerPC.addTrack(track, localStream);
+        });
+      } catch (err) {
+        console.error('In makeCall():', err);
+        alert('In makeCall():', err);
+      }
+    })();
+
+    // ANSWER TRACKS
+    answerPC.addEventListener('track', async (event) => {
+      console.log('answering track');
+      const [remoteStream] = event.streams;
+      audioRef.current.srcObject = remoteStream;
+    });
     
     // Check if peer connection done
     offerPC.addEventListener('connectionstatechange', event => {
@@ -83,9 +155,6 @@ export default function Voice2() {
         console.log('Connected');
       }
     });
-    
-    // session cleanup before new session
-    removeData(session);
   }, []);
 
   async function makeCall() {
@@ -133,12 +202,13 @@ export default function Voice2() {
     // Add to ICE candidates list
     // TRICKLE ICE implementation
     peerConnection.addEventListener('icecandidate', event => {
-      console.log('was here');
       if (event.candidate) {
         console.log('[ Local ICE candidate ] Adding to database');
         addData(iceCandidates, event.candidate);
       }
     });
+
+
   }
 
 
@@ -200,10 +270,12 @@ export default function Voice2() {
         console.log('[ Remote ICE candidate ] Failed to receive');
       }
     });
+
   }
 
   return (
     <StyledDiv>
+      <audio ref={audioRef} />
       <button type="button" onClick={async () => {await makeCall()}}>Call</button>
       <button type="button" onClick={async () => {await answerCall()}}>Answer</button>
     </StyledDiv>
