@@ -26,7 +26,7 @@ function addToList(path, data) {
       data
     });
   } catch (err) {
-    console.log('addToList:', err);
+    console.error('addToList:', err);
   }
 }
 
@@ -72,6 +72,7 @@ export default function Voice() {
     // get candidates for caller and save to db
     pc.onicecandidate = event => {
       console.log('Caller: pushing ice offer candidates');
+      console.log(event.candidates);
       event.candidate && addToList(offerCandidatesPath, event.candidate.toJSON());
     };
 

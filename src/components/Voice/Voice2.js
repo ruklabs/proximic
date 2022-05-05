@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { getDatabase, ref, set, onValue, update, remove, get, child, push } from 'firebase/database';
 
@@ -11,6 +11,7 @@ import { getDatabase, ref, set, onValue, update, remove, get, child, push } from
 // const pc = new RTCPeerConnection([config]);
 
 // PATHS
+const session = '/session'
 const offers = '/session/offers'
 const answers = '/session/answers'
 
@@ -26,6 +27,9 @@ const config = { iceServers: [{
   }],
   iceCandidatePoolSize: 10
 };
+
+const offerPC = new RTCPeerConnection([config]);
+const answerPC = new RTCPeerConnection([config]);
 
 // Database cleanup
 function removeData(path, data) {
@@ -67,23 +71,38 @@ function setData(path, data) {
 
 
 export default function Voice2() {
+  const [called, setCalled] = useState(false);
+  const [answered, setAnswered] = useState(false);
+
   useEffect(() => {
     // on mounting
-
+    
+    // Check if peer connection done
+    offerPC.addEventListener('connectionstatechange', event => {
+      if (offerPC.connectionState === 'connected') {
+        console.log('Connected');
+      }
+    });
+    
+    // session cleanup before new session
+    removeData(session);
   }, []);
 
   async function makeCall() {
-    console.log('Called');
-    // session cleanup before new session
-    removeData(offers);
+    // function guard
+    if (called) return;
 
-    const peerConnection = new RTCPeerConnection([config]);
+    setCalled(true);
+
+    console.log('Called');
+
+    const peerConnection = offerPC;
 
     // SIGNALLING (on 'answer' set the remote description)
     // Look out for the 'answers' path and see if something changed
     onValue(ref(getDatabase(), answers), async snapshot => {
       // MOUNTED offer signaling
-      console.log('MOUNTER: offer signaling')
+      console.log('MOUNTED: offer signaling')
 
       if (!snapshot.val()) {
         console.log('[ Database Update ] Answers changed, No value though');
@@ -114,6 +133,7 @@ export default function Voice2() {
     // Add to ICE candidates list
     // TRICKLE ICE implementation
     peerConnection.addEventListener('icecandidate', event => {
+      console.log('was here');
       if (event.candidate) {
         console.log('[ Local ICE candidate ] Adding to database');
         addData(iceCandidates, event.candidate);
@@ -123,11 +143,14 @@ export default function Voice2() {
 
 
   async function answerCall() {
+    // function guard
+    if (answered) return;
+    
     console.log('Answered');
-    // database cleanup for new session
-    removeData(answers);
 
-    const peerConnection = new RTCPeerConnection([config]);
+    setAnswered(true);
+
+    const peerConnection = answerPC;
 
     // SIGNALLING (on 'offers' set the remote description)
     // Look out for the 'offers' path and see if something changed
