@@ -80,40 +80,22 @@ export default function Voice2() {
 
   useEffect(() => {
     // on mounting
-    
-    // session cleanup before new session
-    removeData(session);
-  
-    // OFFER TRACKS
-    (async () => {
-      try {
-        const localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true
-        });
-        console.log('adding tracks');
 
-        localStream.getTracks().forEach(track => {
-          offerPC.addTrack(track, localStream);
-        });
-      } catch (err) {
-        console.error('In makeCall():', err);
-        alert('In makeCall():', err);
-      }
-    })();
-
-    // ANSWER TRACKS
-    answerPC.addEventListener('track', async (event) => {
-      console.log('answering track');
-      const [remoteStream] = event.streams;
-      audioRef.current.srcObject = remoteStream;
-    });
-    
     // Check if peer connection done
     offerPC.addEventListener('connectionstatechange', event => {
       if (offerPC.connectionState === 'connected') {
         console.log('Connected');
       }
     });
+    
+    setInterval(() => {
+      console.log('offer', offerPC.connectionState);
+      console.log('answer', answerPC.connectionState);
+    }, 5000)
+    
+    // session cleanup before new session
+    removeData(session);
+
   }, []);
 
   async function makeCall() {
@@ -167,7 +149,21 @@ export default function Voice2() {
       }
     });
 
+  
+    // OFFER TRACKS
+    try {
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+      console.log('adding tracks');
 
+      localStream.getTracks().forEach(track => {
+        offerPC.addTrack(track, localStream);
+      });
+    } catch (err) {
+      console.error('In makeCall():', err);
+      alert('In makeCall():', err);
+    }
   }
 
 
@@ -230,6 +226,13 @@ export default function Voice2() {
       }
     });
 
+    // ANSWER TRACKS
+    answerPC.addEventListener('track', async (event) => {
+      console.log('answering track');
+      const [remoteStream] = event.streams;
+      audioRef.current.srcObject = remoteStream;
+    });
+    
   }
 
   return (
