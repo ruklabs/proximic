@@ -17,62 +17,21 @@ const answers = '/session/answers'
 
 const iceCandidates = '/session/ice'
 
-const config = {
-  iceServers: [
+const iceServers = [
     {
-      urls: [
-        "stun1.l.google.com:19302",
-        "stun2.l.google.com:19302",
-        "stun3.l.google.com:19302",
-        "stun4.l.google.com:19302"
-      ]
+      urls: "turn:159.223.72.61:3478?transport=tcp",
+      username: "proximic",
+      credential: "proximic192",
     },
-    {
-      urls: "stun:openrelay.metered.ca:80",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443?transport=tcp",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-  ], 
-};
+]; 
 
-// const config = {
-//   iceServers: [
-//     {
-//       urls: "stun:openrelay.metered.ca:80",
-//     },
-//     {
-//       urls: "turn:openrelay.metered.ca:80",
-//       username: "openrelayproject",
-//       credential: "openrelayproject",
-//     },
-//     {
-//       urls: "turn:openrelay.metered.ca:443",
-//       username: "openrelayproject",
-//       credential: "openrelayproject",
-//     },
-//     {
-//       urls: "turn:openrelay.metered.ca:443?transport=tcp",
-//       username: "openrelayproject",
-//       credential: "openrelayproject",
-//     },
-//   ],
-// };
+const offerPC = new RTCPeerConnection({
+  iceServers
+});
 
-const offerPC = new RTCPeerConnection([config]);
-const answerPC = new RTCPeerConnection([config]);
+const answerPC = new RTCPeerConnection({
+  iceServers
+});
 
 // Database cleanup
 function removeData(path, data) {
