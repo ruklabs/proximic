@@ -18,11 +18,11 @@ const answers = '/session/answers'
 const iceCandidates = '/session/ice'
 
 const iceServers = [
-    {
-      urls: "turn:159.223.72.61:3478?transport=tcp",
-      username: "proximic",
-      credential: "proximic192",
-    },
+  {
+    urls: "turn:159.223.72.61:3478?transport=tcp",
+    username: "proximic",
+    credential: "proximic192",
+  },
 ]; 
 
 const offerPC = new RTCPeerConnection({
@@ -30,7 +30,8 @@ const offerPC = new RTCPeerConnection({
 });
 
 const answerPC = new RTCPeerConnection({
-  iceServers
+  iceServers,
+  iceCandidatePoolSize: 10
 });
 
 // Database cleanup
@@ -81,12 +82,48 @@ export default function Voice2() {
   useEffect(() => {
     // on mounting
 
+    // OFFER TRACKS
+    (async () => {
+      try {
+        const localStream = await navigator.mediaDevices.getUserMedia({
+          audio: true
+        });
+        console.log('adding tracks');
+
+        localStream.getTracks().forEach(track => {
+          console.log('track', track);
+          offerPC.addTrack(track, localStream);
+        });
+      } catch (err) {
+        console.error('In makeCall():', err);
+        alert('In makeCall():', err);
+      }
+    })();
+
+    // ANSWER TRACKS
+    answerPC.addEventListener('track', async (event) => {
+      console.log('answering track');
+      const [remoteStream] = event.streams;
+      audioRef.current.srcObject = remoteStream;
+    });
+
     // Check if peer connection done
     offerPC.addEventListener('connectionstatechange', event => {
       if (offerPC.connectionState === 'connected') {
         console.log('Connected');
       }
     });
+
+
+
+    // errors handlers
+    offerPC.onicecandidateerror = err => {
+      console.error('ICE Error:', err);
+    };
+
+    answerPC.onicecandidateerror = err => {
+      console.error('ICE Error:', err);
+    };
     
     setInterval(() => {
       console.log('offer', offerPC.connectionState);
@@ -142,28 +179,17 @@ export default function Voice2() {
     // Listen for local ICE candidates on local RTCPeerConnection
     // Add to ICE candidates list
     // TRICKLE ICE implementation
-    peerConnection.addEventListener('icecandidate', event => {
+    peerConnection.onicecandidate = event => {
       if (event.candidate) {
         console.log('[ Local ICE candidate ] Adding to database');
-        addData(iceCandidates, event.candidate);
+        console.log(event.candidate);
+        try {
+          addData(iceCandidates, event.candidate);
+        } catch (err) {
+          console.log('[ Local ICE candidate ]', err);
+        }
       }
-    });
-
-  
-    // OFFER TRACKS
-    try {
-      const localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
-      console.log('adding tracks');
-
-      localStream.getTracks().forEach(track => {
-        offerPC.addTrack(track, localStream);
-      });
-    } catch (err) {
-      console.error('In makeCall():', err);
-      alert('In makeCall():', err);
-    }
+    };
   }
 
 
@@ -220,18 +246,13 @@ export default function Voice2() {
       const data = Object.values(snapshot.val())[0].data;
 
       try {
+        console.log('[ Remote ICE candidate ] Adding ice candidate');
         await peerConnection.addIceCandidate(data);
       } catch (err) {
         console.log('[ Remote ICE candidate ] Failed to receive');
       }
     });
 
-    // ANSWER TRACKS
-    answerPC.addEventListener('track', async (event) => {
-      console.log('answering track');
-      const [remoteStream] = event.streams;
-      audioRef.current.srcObject = remoteStream;
-    });
     
   }
 
