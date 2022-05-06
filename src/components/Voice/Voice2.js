@@ -1,15 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styled from 'styled-components';
-import { getDatabase, ref, set, onValue, update, remove, get, child, push } from 'firebase/database';
+import { getDatabase, ref, set, onValue, onDelete, update, remove, get, child, push } from 'firebase/database';
 
 
 // 2 Main Responsibilities
 // [ ] Establish Peer Connection
 // [ ] Push data via stream with peer connection
-
-// How to use config for peer connection 
-// const pc = new RTCPeerConnection([config]);
 
 // PATHS
 const session = '/session'
@@ -63,6 +60,7 @@ function setData(path, data) {
 
 // global af
 let localStream;
+let remoteStream;
 const offerOptions = { offerToReceiveAudio: 1 };
 
 export async function deviceInit() {
@@ -88,6 +86,7 @@ export async function deviceInit() {
 export default function Voice2({ user }) {
   const [peerConnections, setPeerConnections] = useState({});
   const [connections, setConnections] = useState([]);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     // mounting
@@ -99,6 +98,7 @@ export default function Voice2({ user }) {
       removeData(session + `/${user.uid}`);
     });
 
+
     return () => {
       // on dismount
       console.log('DISMOUNTING');
@@ -107,7 +107,10 @@ export default function Voice2({ user }) {
     };
   }, []);
 
+
   const enterSession = async user => {
+    await deviceInit();
+
     setData(lobby + `/${user.uid}`, user.uid);
 
     let peers;
@@ -119,79 +122,88 @@ export default function Voice2({ user }) {
       console.log("Can't get session");
     }
 
-    // first resolve all connection requests from peers
-    console.log('peers:', peers);
-    peers.forEach(p => {
-      onValue(ref(getDatabase(), session + `/${user.uid}/${p}/offer`), async snapshot => {
+    console.log('peers', peers);
+    // send offers to peers
+    peers.forEach(async p => {
+      await offer(p);
+    });
+
+    // respond to offers
+    onValue(ref(getDatabase(), session + `/${user.uid}/receivedOffersFrom`), async snapshot => {
         if (!snapshot.val()) {
-          console.log('/p/id/offer');
+          console.log('Initial /id/receivedFrom/p');
         } else {
-          console.log(`Got offer from ${user.uid}`);
-          // if there is offer -> then give answer
-          peerConnections[p] = new RTCPeerConnection(iceServers);
+          for (const [k, v] of Object.entries(snapshot.val())) {
+            console.log(`Got offer from ${k}`);
+            peerConnections[k] = new RTCPeerConnection(iceServers);
+            await peerConnections[k].setRemoteDescription(v.data);
 
-          const offer = snapshot.val().data;
-          console.log('p', p);
-          console.log('offer', offer);
-          await peerConnections[p].setRemoteDescription(offer);
+            const answer = await peerConnections[k].createAnswer();
+            await peerConnections[k].setLocalDescription(answer);
+            setData(session + `/${k}/receivedAnswersFrom/${user.uid}`, answer);
+          }
 
-          const answer = peerConnections[p].createAnswer();
-          await peerConnections[p].setLocalDescription(answer);
-          setData(session + `/${user.uid}/${p}/answer`, answer);
+          // time to get 'em ice candidates from remote
+          onValue(ref(getDatabase(), session + `/${user.uid}/iceReceivedFrom/`), async snapshot => {
+              if (!snapshot.val()) {
+                console.log('Initial /id/iceReceivedFrom/p');
+              } else {
+                for (const [k, v] of Object.entries(snapshot.val())) {
+                  console.log(`Got ice from ${k}`);
+                  try {
+                    console.log(v.data);
+                    peerConnections[k].addIceCandidate(v.data);
+                  } catch (err) {
+                    console.err('Adding ICE:', err);
+                  }
 
-          // update connections
-          connections.push(p);
+                  // time to get 'em tracks
+                  peerConnections[k].addEventListener('track', async event => {
+                    const [remoteStream] = event.streams;
+                    audioRef.current.srcObject = remoteStream;
+                  });
+                }
+              }
+          });
         }
-      });
+    });
+  };
+
+
+
+  const offer = async (peer) => {
+    peerConnections[peer] = new RTCPeerConnection(iceServers);
+
+    // wait for answer
+    onValue(ref(getDatabase(), session + `/${user.uid}/receivedAnswersFrom/${peer}`), async snapshot => {
+        if (!snapshot.val()) {
+          console.log('Waiting for /id/p/answer');
+        } else {
+          console.log(`Got answer from ${peer}`);
+
+          const answer = snapshot.val().data;
+          console.log('answer', answer);
+          await peerConnections[peer].setRemoteDescription(answer);
+
+          // listen for local ice candidates
+          peerConnections[peer].addEventListener('icecandidate', event => {
+            if (event.candidate) {
+              console.log(event.candidate);
+              setData(session + `/${peer}/iceReceivedFrom/${user.uid}`);
+            }
+          });
+
+          localStream.getAudioTracks().forEach(track => peerConnections[peer].addTrack(track, localStream));
+        }
     });
 
-    listenToNewPeers();
-  }
+    console.log('peer', peer);
 
-  const listenToNewPeers = () => {
-    // then start listening for NEW peers entering lobby
-    // listening for session/lobby changes
-    onValue(ref(getDatabase(), lobby), async snapshot => {
-      if (!snapshot.val()) {
-        return;
-      };
-
-      // get peers
-      const peers = Object.values(snapshot.val())
-                          .map(e => e.data)
-                          .filter(e => e !== user.uid);
-
-      // peers you haven't connected with yet
-      const newPeers = peers.filter(e => !connections.includes(e));
-      // console.log('newPeers', newPeers);
-
-      // commence connection sequence for each new peer
-      newPeers.forEach(async p => {
-        peerConnections[p] = new RTCPeerConnection(iceServers);
-
-        // answer
-        // onValue(ref(getDatabase(), session + `/${p}/${user.uid}/answer`), async snapshot => {
-        //   if (!snapshot.val()) {
-        //     console.log('[ Lobby ] No value though');
-        //   } else {
-        //     console.log('const answer = ',  snapshot.val().data);
-        //     const answer = snapshot.val().data
-        //     await peerConnections[p].setRemoteDescription(answer);
-        //   }
-        // });
-
-        
-        console.log(`Offering to new kid in town: ${p}`);
-
-        // offer
-        const offer = await peerConnections[p].createOffer(offerOptions);
-        await peerConnections[p].setLocalDescription(offer);
-        setData(session + `/${user.uid}/${p}/offer`, offer);
-
-        // addTrack local track
-        // getTrack get remote track
-      });
-    });
+    // signal offer
+    console.log('Sending offer to', peer);
+    const offer = await peerConnections[peer].createOffer(offerOptions);
+    await peerConnections[peer].setLocalDescription(offer);
+    setData(session + `/${peer}/receivedOffersFrom/${user.uid}`, offer);
   };
 
   const call = async user => {
@@ -206,6 +218,7 @@ export default function Voice2({ user }) {
 
   return (
     <div>
+      <audio ref={audioRef} />
       <button type="button" onClick={()=>call(user)}>Call</button>
     </div>
   );
