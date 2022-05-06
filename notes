@@ -1,0 +1,8 @@
+
+# webrtc notes
+
+turn / stun servers for resolving NAT and Firewall access
+ICE protocol for session agreement
+Realtime Database for signaling
+
+

@@ -232,9 +232,10 @@ const StyledAvatar = styled.div`
   span {
     position: absolute;
     top: -20px;
+    left: -15px;
     
     p {
-      font-size: 16px;
+      font-size: 12px;
       color: white;
       text-shadow: 1px 1px 2px black;
     }

@@ -25,6 +25,8 @@ import sprite2 from '../../resources/sprite2.gif';
 import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
+import Voice2 from '../Voice/Voice2';
+
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
 
@@ -143,6 +145,7 @@ function App() {
           <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
           <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
         </div>
+        <Voice2 />
         <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
       </aside>
 
