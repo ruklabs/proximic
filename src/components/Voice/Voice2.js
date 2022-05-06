@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import styled from 'styled-components';
 import { getDatabase, ref, set, onValue, update, remove, get, child, push } from 'firebase/database';
 
@@ -12,6 +13,7 @@ import { getDatabase, ref, set, onValue, update, remove, get, child, push } from
 
 // PATHS
 const session = '/session'
+const sessionHost = '/session/host'
 const offers = '/session/offers'
 const answers = '/session/answers'
 
@@ -38,7 +40,6 @@ function getName(pc) {
 function getOtherPc(pc) {
   return (pc === pc1) ? pc2 : pc1;
 }
-
 
 // Database cleanup
 function removeData(path, data) {
@@ -78,6 +79,17 @@ function setData(path, data) {
   }
 }
 
+export async function deviceInit() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    localStream = stream;
+    return true;
+  } catch (err) {
+    console.log('Invalid: Device permission is required.', err);
+    return false;
+  }
+}
+
 
 // Component
 export default function Voice2() {
@@ -87,20 +99,15 @@ export default function Voice2() {
 
   useEffect(() => {
     // on mounting
+    removeData(session);
 
     // OFFER TRACKS
     (async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        localStream = stream;
-      } catch (err) {
-        console.error('In ():', err);
-        alert('In mounting():', err);
-      }
     })();
 
-    removeData(session);
-
+    // on unload 
+    window.addEventListener('beforeunload', (event) => {
+    })
   }, []);
 
   async function onIceCandidate(pc, event) {

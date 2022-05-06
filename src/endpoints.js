@@ -63,8 +63,3 @@ export function exitLobby(userId) {
   const db = getDatabase();
   remove(ref(db, `lobby/${userId}`));
 }
-
-export function signal() {
-  const db = getDatabase();
-  set(ref(db, `ItsWorking/`), true);
-}

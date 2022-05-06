@@ -25,7 +25,7 @@ import sprite2 from '../../resources/sprite2.gif';
 import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
-import Voice2 from '../Voice/Voice2';
+import { deviceInit } from '../Voice/Voice2';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
@@ -47,24 +47,41 @@ function App() {
 
   const { currentUser, signIn, signUp, signOff } = useAuth();
 
+
   useEffect(() => {
     // on mount
   }, []);
 
   const formSignIn = (e) => {
     e.preventDefault();
+    
+    
     (async () => {
-      let result = await signIn(email.current.value, pass.current.value);
 
-      if (!result) {
+      const permission = await deviceInit();
+
+      if (!permission) {
         setAlertAttrib(prev => {
           const newAlert = JSON.parse(JSON.stringify(prev));
           newAlert.isAlert = true;
-          newAlert.msg = "Invalid email and/or password!";
+          newAlert.msg = "Device permission is required to sign in";
           newAlert.alertType = "error";
           return newAlert;
         });
+      } else {
+        let result = await signIn(email.current.value, pass.current.value);
+
+        if (!result) {
+          setAlertAttrib(prev => {
+            const newAlert = JSON.parse(JSON.stringify(prev));
+            newAlert.isAlert = true;
+            newAlert.msg = "Invalid email and/or password!";
+            newAlert.alertType = "error";
+            return newAlert;
+          });
+        }
       }
+
     })()
   };
 
@@ -98,8 +115,21 @@ function App() {
         return newFormValid;
       });
 
-      signUp(email.current.value, username.current.value, pass.current.value);
+      (async () => {
+        const permission = await deviceInit();
 
+        if (!permission) {
+          setAlertAttrib(prev => {
+            const newAlert = JSON.parse(JSON.stringify(prev));
+            newAlert.isAlert = true;
+            newAlert.msg = "Device permission is required to sign up";
+            newAlert.alertType = "error";
+            return newAlert;
+          });
+        } else {
+          await signUp(email.current.value, username.current.value, pass.current.value);
+        }
+      })();
     } else {
       console.log('Your passwords are not the same');
       setConPassValid(prev => {
@@ -145,7 +175,6 @@ function App() {
           <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
           <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
         </div>
-        <Voice2 />
         <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
       </aside>
 
