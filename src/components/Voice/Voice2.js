@@ -86,22 +86,26 @@ export async function deviceInit() {
 
 
 export default function Voice2({ user }) {
-  const [isHost, setIsHost] = useState(false);
   const [peerConnections, setPeerConnections] = useState({});
   const [connections, setConnections] = useState([]);
 
   useEffect(() => {
     // mounting
     enterSession(user);
+
+    window.addEventListener('beforeunload', event => {
+      console.log('UNLOADING');
+      removeData(lobby + `/${user.uid}`);
+      removeData(session + `/${user.uid}`);
+    });
+
+    return () => {
+      // on dismount
+      console.log('DISMOUNTING');
+      removeData(lobby + `/${user.uid}`);
+      removeData(session + `/${user.uid}`);
+    };
   }, []);
-
-  useEffect(() => {
-    console.log('IS HOST?', isHost);
-
-    if (isHost) {
-      // make offers
-    }
-  }, [isHost]);
 
   const enterSession = async user => {
     setData(lobby + `/${user.uid}`, user.uid);
@@ -115,41 +119,40 @@ export default function Voice2({ user }) {
       console.log("Can't get session");
     }
 
-    // check if host
-    if (peers.length === 0) {
-      // if host clear session on unload
-      setIsHost(true);
-      window.addEventListener('beforeunload', event => {
-        removeData(lobby + `/${user.uid}`);
-      });
-    }
-
     // first resolve all connection requests from peers
     console.log('peers:', peers);
     peers.forEach(p => {
-      onValue(ref(getDatabase(), session + `/${p}/${user.id}/offer`), async snapshot => {
+      onValue(ref(getDatabase(), session + `/${user.uid}/${p}/offer`), async snapshot => {
         if (!snapshot.val()) {
           console.log('/p/id/offer');
         } else {
-          console.log('/p/id/offer giving answer');
+          console.log(`Got offer from ${user.uid}`);
           // if there is offer -> then give answer
           peerConnections[p] = new RTCPeerConnection(iceServers);
 
           const offer = snapshot.val().data;
+          console.log('p', p);
+          console.log('offer', offer);
           await peerConnections[p].setRemoteDescription(offer);
 
           const answer = peerConnections[p].createAnswer();
           await peerConnections[p].setLocalDescription(answer);
-          setData(session + `/${p}/${user.uid}/answer`, answer);
+          setData(session + `/${user.uid}/${p}/answer`, answer);
+
+          // update connections
+          connections.push(p);
         }
       });
     });
 
+    listenToNewPeers();
+  }
+
+  const listenToNewPeers = () => {
     // then start listening for NEW peers entering lobby
     // listening for session/lobby changes
     onValue(ref(getDatabase(), lobby), async snapshot => {
       if (!snapshot.val()) {
-        console.log('[ Lobby ] No value though');
         return;
       };
 
@@ -158,34 +161,28 @@ export default function Voice2({ user }) {
                           .map(e => e.data)
                           .filter(e => e !== user.uid);
 
-      // if HOST clear session on unload
-      if (peers.length === 0) {
-        setIsHost(true);
-        window.addEventListener('beforeunload', event => {
-          removeData(lobby + `/${user.uid}`);
-        });
-      }
-
       // peers you haven't connected with yet
       const newPeers = peers.filter(e => !connections.includes(e));
-      console.log('newPeers', newPeers);
+      // console.log('newPeers', newPeers);
 
       // commence connection sequence for each new peer
       newPeers.forEach(async p => {
         peerConnections[p] = new RTCPeerConnection(iceServers);
 
         // answer
-        onValue(ref(getDatabase(), session + `/${p}/${user.uid}/answer`), async snapshot => {
-          if (!snapshot.val()) {
-            console.log('[ Lobby ] No value though');
-          } else {
-            console.log('const answer = ',  snapshot.val().data);
-            const answer = snapshot.val().data
-            await peerConnections[p].setRemoteDescription(answer);
-          }
-        });
+        // onValue(ref(getDatabase(), session + `/${p}/${user.uid}/answer`), async snapshot => {
+        //   if (!snapshot.val()) {
+        //     console.log('[ Lobby ] No value though');
+        //   } else {
+        //     console.log('const answer = ',  snapshot.val().data);
+        //     const answer = snapshot.val().data
+        //     await peerConnections[p].setRemoteDescription(answer);
+        //   }
+        // });
 
         
+        console.log(`Offering to new kid in town: ${p}`);
+
         // offer
         const offer = await peerConnections[p].createOffer(offerOptions);
         await peerConnections[p].setLocalDescription(offer);
@@ -195,7 +192,7 @@ export default function Voice2({ user }) {
         // getTrack get remote track
       });
     });
-  }
+  };
 
   const call = async user => {
     // run deviceInit() just incase
@@ -209,7 +206,6 @@ export default function Voice2({ user }) {
 
   return (
     <div>
-      <p>{ isHost ? 'Host: Yes' : 'Host: No'}</p>
       <button type="button" onClick={()=>call(user)}>Call</button>
     </div>
   );
