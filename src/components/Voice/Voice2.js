@@ -13,6 +13,7 @@ import { getDatabase, ref, set, onValue, update, remove, get, child, push } from
 
 // PATHS
 const session = '/session'
+const lobby = '/session/lobby'
 const sessionHost = '/session/host'
 const offers = '/session/offers'
 const answers = '/session/answers'
@@ -29,9 +30,8 @@ const iceServers = [
 
 let pc1;
 let pc2;
-let localStream;
+let localStreamOG;
 
-const offerOptions = { offerToReceiveAudio: 1 };
 
 function getName(pc) {
   return (pc === pc1) ? 'pc1' : 'pc2';
@@ -79,6 +79,13 @@ function setData(path, data) {
   }
 }
 
+// global af
+let localStream;
+let otherPeers = [];
+let outPeerConnections = {};
+let inPeerConnections = {};
+const offerOptions = { offerToReceiveAudio: 1 };
+
 export async function deviceInit() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -90,6 +97,178 @@ export async function deviceInit() {
   }
 }
 
+export function sessionCleanup() {
+  removeData(session);
+}
+
+export async function enterSession(user) {
+  // update session lobby 
+  setData(lobby + `/${user.uid}`, user.uid);
+
+  let peers;
+  const dbRef = ref(getDatabase());
+  const response = await get(child(dbRef, lobby));
+
+  if (response.exists()) {
+    peers =  response.val();
+  } else {
+    console.log("Can't get session");
+  }
+
+  otherPeers = Object.keys(peers).filter(e => e !== user.uid);
+  console.log(otherPeers);
+
+  // listening for session/lobby changes
+  onValue(ref(getDatabase(), lobby), async snapshot => {
+    if (!snapshot.val()) {
+      console.log('[ Lobby Updated ] No value though');
+      return;
+    };
+
+    console.log('[ Lobby Updating ]');
+
+    // update other peers
+    const data = Object.values(snapshot.val()).map(e => e.data);
+    otherPeers = data.filter(e => e !== user.uid);
+    console.log('otherPeers', otherPeers);
+  });
+}
+
+export async function call(user) {
+  // run deviceInit() just incase
+  await deviceInit();
+
+  enterSession(user);
+
+  const audioTracks = localStream.getAudioTracks();
+  if (audioTracks.length > 0) {
+    console.log(`Using audio device: ${audioTracks[0].label}`);
+  }
+
+  // OUTBOUND   /owner/other
+  // generate local peer connections for each peer in lobby
+  otherPeers.forEach(async other => {
+
+    // create peer connection
+    outPeerConnections[other] = new RTCPeerConnection(iceServers);
+
+    // make offer for each
+    const offer = await outPeerConnections[other].createOffer(offerOptions);
+    outPeerConnections[other].setLocalDescription(offer);
+
+    // signal made offer for other peers
+    setData(session + `/${user.uid}/${other}/offer`, offer);
+
+    // add ICE listeners
+    outPeerConnections[other].addEventListener('icecandidate', event => {
+      if (event.candidate) {
+        // signal ice in database (offer)
+        setData(session + `/${user.uid}/${other}/ice`, event.candidate);
+      }
+    });
+
+    // add ICE listeners
+    outPeerConnections[other].addEventListener('icecandidate', event => {
+      if (event.candidate) {
+        // signal ice in database (offer)
+        setData(session + `/${user.uid}/${other}/ice`, event.candidate);
+      }
+    });
+
+
+    // INBOUND  /other/owner
+    // listen for offers (from other peers) from database
+    // use that as remote description
+    onValue(ref(getDatabase(), session + `/${other}/${user.uid}/offer`), async snapshot => {
+      if (!snapshot.val()) {
+        console.log(`[ Updated /session/${other}/${user.uid}/offer No value though`);
+        return;
+      };
+
+      const data = snapshot.val().data; 
+      console.log(`session/${other}/${user.uid}/offer`, data);
+      // set as remote description
+      inPeerConnections[other].setRemoteDescription(data);
+
+      // create Answer
+      const answer = await inPeerConnections[other].createAnswer();
+      inPeerConnections[other].setLocalDescription(answer);
+
+      // signal the answer
+      setData(session + `/${other}/${user.id}/answer`, answer);
+    });
+
+    // listen for answers (sdp replies) from database
+    // use that as remote description
+    onValue(ref(getDatabase(), session + `/${other}/${user.uid}/answer`), async snapshot => {
+      if (!snapshot.val()) {
+        console.log(`[ Updated /session/${other}/${user.uid}/answer No value though`);
+        return;
+      };
+
+      const data = snapshot.val().data; 
+      console.log(`session/${other}/${user.uid}/answer`, data);
+
+      // set as remote description
+      outPeerConnections[other].setRemoteDescription(data);
+    });
+
+    // listen for inbound ICE candidates from database
+    // Use that for peer connection
+    onValue(ref(getDatabase(), session + `/${other}/${user.uid}/ice`), async snapshot => {
+      if (!snapshot.val()) {
+        console.log(`[ Updated /session/${other}/${user.uid}/ice No value though`);
+        return;
+      };
+
+      // update other peers
+      const data = snapshot.val().data;
+      console.log('sheeshj', data);
+      outPeerConnections[other].addIceCandidate(data);
+
+      console.log(`[ Updated /session/${other}/${user.uid}/ice with ${data}`);
+    });
+  });
+
+  // pc1 = new RTCPeerConnection(iceServers);
+  // pc1.addEventListener('icecandidate', event => onIceCandidate(pc1, event));
+  // pc2 = new RTCPeerConnection(iceServers);
+  // pc2.addEventListener('icecandidate', event => onIceCandidate(pc2, event));
+  // async function onIceCandidate(pc, event) {
+  //   try {
+  //     await (getOtherPc(pc).addIceCandidate(event.candidate));
+  //     onAddIceCandidateSuccess(pc);
+  //   } catch (err) {
+  //     onAddIceCandidateError(pc, err);
+  //   }
+  // }
+}
+
+async function onIceCandidate(owner, other, event) {
+  try {
+    // get the other peer connection via database
+    // to change add ice candidate
+    const dbRef = ref(getDatabase());
+    const response = await get(child(dbRef, session + `/${other}/${owner}`));
+
+    let peer;
+    if (response.exists()) {
+      peer =  response.val();
+    }
+
+    // addIceCandidate to retrieved peer
+    peer.addIceCandidate(event.candidate)
+
+    // then update peer on server
+    setData(`/${other}/${owner}`, peer)
+
+    console.log('add ice success');
+    // onAddIceCandidateSuccess(owner);
+  } catch (err) {
+    console.log('add ice error');
+    // onAddIceCandidateError(other, err);
+  }
+}
 
 // Component
 export default function Voice2() {
@@ -99,7 +278,6 @@ export default function Voice2() {
 
   useEffect(() => {
     // on mounting
-    removeData(session);
 
     // OFFER TRACKS
     (async () => {
@@ -110,21 +288,43 @@ export default function Voice2() {
     })
   }, []);
 
-  async function onIceCandidate(pc, event) {
+  async function onIceCandidate(owner, other, event) {
     try {
-      await (getOtherPc(pc).addIceCandidate(event.candidate));
-      onAddIceCandidateSuccess(pc);
+      // get the other peer connection via database
+      // to change add ice candidate
+      const dbRef = ref(getDatabase());
+      const response = await get(child(dbRef, session + `/${other}/${owner}`));
+
+      let peer;
+      if (response.exists()) {
+        peer =  response.val();
+      }
+
+      // addIceCandidate to retrieved peer
+      peer.addIceCandidate(event.candidate)
+
+      // then update peer on server
+      setData(`/${other}/${owner}`, peer)
+
+      onAddIceCandidateSuccess(owner);
     } catch (err) {
-      onAddIceCandidateError(pc, err);
+      onAddIceCandidateError(other, err);
     }
+
+    // try {
+    //   await (getOtherPc(pc).addIceCandidate(event.candidate));
+    //   onAddIceCandidateSuccess(pc);
+    // } catch (err) {
+    //   onAddIceCandidateError(pc, err);
+    // }
   }
 
-  function onAddIceCandidateError(pc, err) {
-    console.error(`${getName(pc)} failed to add ICE Candidate: ${err.toString()}`);
+  function onAddIceCandidateError(other, err) {
+    console.error(`${other} failed to add ICE Candidate: ${err.toString()}`);
   }
 
-  function onAddIceCandidateSuccess(pc) {
-    console.log(`${getName(pc)} addIceCandidate success`);
+  function onAddIceCandidateSuccess(owner) {
+    console.log(`${owner} addIceCandidate success`);
   }
 
   function oneIceStateChange(pc, event) {
@@ -206,7 +406,7 @@ export default function Voice2() {
     console.log(`Failed to create session description: ${error.toString()}`);
   }
 
-  async function call() {
+  async function makeCall() {
     // function guard
     if (called) return;
 
@@ -214,7 +414,7 @@ export default function Voice2() {
 
     console.log('Called');
 
-    const audioTracks = localStream.getAudioTracks();
+    const audioTracks = localStreamOG.getAudioTracks();
     if (audioTracks.length > 0) {
       console.log(`Using audio device: ${audioTracks[0].label}`);
     }
@@ -235,7 +435,7 @@ export default function Voice2() {
     pc2.addEventListener('track', gotRemoteStream);
 
     // add localstream to pc1
-    localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
+    localStreamOG.getTracks().forEach(track => pc1.addTrack(track, localStreamOG))
     console.log('Added local stream to pc1');
 
     // time to create the offer
@@ -260,7 +460,7 @@ export default function Voice2() {
   return (
     <StyledDiv>
       <audio ref={audioRef} />
-      <button type="button" onClick={async () => {await call()}}>Call</button>
+      <button type="button" onClick={async () => {await makeCall()}}>Call</button>
       <button type="button" onClick={async () => {await answer()}}>Answer</button>
     </StyledDiv>
   );
@@ -275,6 +475,9 @@ const StyledDiv = styled.div`
     margin: 0 2vw;
   }
 `;
+
+export function Voice() {
+}
 
 
 

@@ -7,3 +7,37 @@ Realtime Database for signaling
 
 
 # Process of connection establishment
+
+# game plan
+eliminate 'answer' instead create one way streams from own->other to simplify the process
+
+mounting
+	session cleanup
+	device init
+	- have own localstream (via deviceInit)
+	- have offeroptions
+
+call
+	- display device used for sanity check
+	- generate all peer connections needed for lobby
+		- own peer connection -> other (one rtcpeerconnection for each)
+			- signaling (get all in the lobby) and generate own -> other pairs
+		- add icecandidate event listener for each own -> other pair
+		- await (getOtherPc(pc).addIceCandidate(event.candidate));
+	- add event listeners for all inbound peer connection
+		- pc2.addEventListener('track', gotRemoteStream);
+		- if (audioRef.current.srcObject !== event.streams[0]) {
+		  audioRef.current.srcObject = event.streams[0];
+	- add localstream to each own peer connection with other pair
+		- adding of track step
+	- createOffer for each 'own' peer connection with 'offerOptions'
+		- outbound
+		- this is the SDP step
+	- set localdescription for each 'own' in own->other pairs
+		- await pc1.setLocalDescription(desc);
+	- createAnswer for each inbound peer connection
+		- for each own->other pair
+		- await pc1.setRemoteDescription(desc);
+	- generate audio tag for each inbound (other) connection
+		-modify srcObject
+		
