@@ -25,7 +25,8 @@ import sprite2 from '../../resources/sprite2.gif';
 import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
-import { deviceInit, call } from '../Voice/Voice2';
+import Voice2 from '../Voice/Voice2';
+import { deviceInit } from '../Voice/Voice2';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
@@ -172,9 +173,9 @@ function App() {
         <p>{ currentUser.uid }</p>
         <p>Verified: {currentUser.emailVerified ? 'Yes' : 'Not Yet'}</p>
         <div className="audio-control">
-          <img src={mute_icon} onClick={() => call(currentUser)} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
           <img src={mute_icon} onClick={() => muteVolume()} style={isMuted ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
           <img src={deafen_icon} onClick={() => deafenSound()} style={isDeafened ? {filter: `grayscale(0%)`}: {filter: `grayscale(100%)`}}/>
+        <Voice2 user={currentUser}/>
         </div>
         <ProxiButton onClick={formSignOff} type="button" variant="contained" >Sign Out</ProxiButton>
       </aside>
