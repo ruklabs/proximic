@@ -25,7 +25,7 @@ import sprite2 from '../../resources/sprite2.gif';
 import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
-import { join, mute } from '../Voice/Voice2';
+import { join, mute, deafen } from '../Voice/Voice2';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
@@ -50,6 +50,7 @@ function App() {
 
   useEffect(() => {
     // on mount
+    join();
   }, []);
 
   const formSignIn = (e) => {
@@ -124,16 +125,17 @@ function App() {
 
   
     
-  const muteVolume = () => {
+  const muteVolume = async () => {
     // Place backend interface function for muting here
-    mute();
+    await mute();
     setIsMuted(prev => {
       return !prev;
     });
   }
 
-  const deafenSound = () => {
+  const deafenSound = async () => {
     // Place backend interface function for deafening here
+    await deafen();
     setIsDeafened(prev => {
       return !prev;
     });

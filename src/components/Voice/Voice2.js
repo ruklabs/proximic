@@ -46,12 +46,18 @@ const APPID = process.env.REACT_APP_AGORA_APPID
 const TOKEN = process.env.REACT_APP_AGORA_TOKEN
 const CHANNEL = process.env.REACT_APP_AGORA_CHANNEL
 
+// Lobby UID to Agora UID
+const luidToAuid = {};
+
 let localTrack;
 let uid;
-let remoteUsers = {};
+const remoteUsers = {};
 let client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+let deaf = false;
 
 export const join = async () => {
+  // clean up and disconnect on unload
+  console.log('CLIENT', client);
   window.addEventListener('beforeunload', async () => {
     await leaveAndRemoveLocalStream();
   });
@@ -76,7 +82,23 @@ export const mute = async (e) => {
   }
 };
 
-// export const deafend = async (e) => 
+export const deafen = async (e) => {
+  if (deaf) {
+    deaf = false;
+    const keys = Object.keys(remoteUsers); 
+    keys.forEach(k => {
+      console.log(k);
+      remoteUsers[k].audioTrack.setVolume(100);
+    });
+  } else {
+    deaf = true;
+    const keys = Object.keys(remoteUsers); 
+    keys.forEach(k => {
+      console.log(k);
+      remoteUsers[k].audioTrack.setVolume(0);
+    });
+  }
+};
 
 export const handleNewUser = async (user, mediaType) => {
   console.log('NEW USER ENTERED THE CHANNEL');
@@ -100,13 +122,15 @@ export const leaveAndRemoveLocalStream = async () => {
 };
 
 export default function Voice2({ user }) {
+  const map = () => {
+    luidToAuid[user.uid] = uid;
+  };
+
   return (
-    <div>
-      <button type="button" onClick={join}>Join</button>
-      <button type="button" onClick={mute}>Turn Off Mic</button>
-    </div>
+    <StyledAnchor></StyledAnchor>
   );
 }
-      //
-      // <button type="button" onClick={async (e) => await joinStream(e)}>Join</button>
-      // <button type="button" onClick={async (e) => await toggleMic(e)}>Mic</button>
+
+const StyledAnchor = styled.span`
+  display: none;
+`;
