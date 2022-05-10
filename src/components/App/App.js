@@ -25,7 +25,7 @@ import sprite2 from '../../resources/sprite2.gif';
 import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
-import { join, mute, deafen } from '../Voice/Voice2';
+import { mute, deafen } from '../Voice/Voice2';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
@@ -50,7 +50,6 @@ function App() {
 
   useEffect(() => {
     // on mount
-    join();
   }, []);
 
   const formSignIn = (e) => {

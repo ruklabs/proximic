@@ -70,6 +70,12 @@ export const join = async () => {
   uid = await client.join(APPID, CHANNEL, TOKEN, null);
   localTrack = await AgoraRTC.createMicrophoneAudioTrack();
   await client.publish(localTrack);
+
+  return uid;
+};
+
+export const setVol = async (auid, vol) => {
+  remoteUsers[auid].audioTrack.setVolume(vol);
 };
 
 export const mute = async (e) => {

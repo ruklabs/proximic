@@ -32,10 +32,20 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getDatabase, ref, onValue  } from 'firebase/database';
 import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
+import { join, setVol } from '../Voice/Voice2';
 
 const DELTA = 1;
 const BORDER_FLOOR = 0;
 const BORDER_CEIL = 90;
+
+let AGORAUID;
+
+const ACTIVE_DIST= 10;
+
+const distance = (x1, y1, x2, y2) => {
+  const sum = Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2);
+  return Math.sqrt(sum);
+};
 
 export default function Lobby(props) {
   const { currentUser } = useAuth();
@@ -57,10 +67,13 @@ export default function Lobby(props) {
 
   useEffect(() => {
     // on mount
+    join()
+      .then(auid => {
+        AGORAUID = auid;
 
     getUsername(currentUser.uid)
       .then(uname => {
-        const p = new Player(uname, 50, 50, downSprites[props.sprite]);
+        const p = new Player(uname, 50, 50, downSprites[props.sprite], AGORAUID);
         enterLobby(currentUser.uid, p);
 
         getLobby()
@@ -75,14 +88,39 @@ export default function Lobby(props) {
           .catch(err => {
             console.error('In mounting', err);
           });
+
       })
       .catch(err => {
         console.error('In mounting', err);
       });
 
+
+      })
+      .catch(err => {
+        console.log("Lobby Mounting:", err);
+      });
+
     // sync lobby
     onValue(ref(getDatabase(), 'lobby/'), snapshot => {
       const data = snapshot.val();
+
+      // iterate through every player
+      Object.keys(data).forEach(player => {
+        if (player === currentUser.uid) return;
+
+        const d = distance(myPosX.current, myPosY.current, data[player].x, data[player].y);
+        const ratio = d / ACTIVE_DIST;
+        console.log('ratio', ratio);
+
+        if (ratio > 1) {
+          // no volume
+          setVol(data[player].auid, 0);
+        } else {
+          const vol = 100 - 100 * ratio;
+          setVol(data[player].auid, vol);
+        }
+      });
+
       setPlayers(data);
     });
     
