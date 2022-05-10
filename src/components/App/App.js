@@ -26,7 +26,6 @@ import sprite3 from '../../resources/sprite3.gif';
 import sprite4 from '../../resources/sprite4.gif';
 
 import Voice2 from '../Voice/Voice2';
-import { deviceInit } from '../Voice/Voice2';
 
 const sprites = [sprite, sprite2, sprite3, sprite4];
 const spriteSelect = Math.floor((Math.random() * 4));
@@ -58,29 +57,16 @@ function App() {
     
     
     (async () => {
+      let result = await signIn(email.current.value, pass.current.value);
 
-      const permission = await deviceInit();
-
-      if (!permission) {
+      if (!result) {
         setAlertAttrib(prev => {
           const newAlert = JSON.parse(JSON.stringify(prev));
           newAlert.isAlert = true;
-          newAlert.msg = "Device permission is required to sign in";
+          newAlert.msg = "Invalid email and/or password!";
           newAlert.alertType = "error";
           return newAlert;
         });
-      } else {
-        let result = await signIn(email.current.value, pass.current.value);
-
-        if (!result) {
-          setAlertAttrib(prev => {
-            const newAlert = JSON.parse(JSON.stringify(prev));
-            newAlert.isAlert = true;
-            newAlert.msg = "Invalid email and/or password!";
-            newAlert.alertType = "error";
-            return newAlert;
-          });
-        }
       }
 
     })()
@@ -117,19 +103,7 @@ function App() {
       });
 
       (async () => {
-        const permission = await deviceInit();
-
-        if (!permission) {
-          setAlertAttrib(prev => {
-            const newAlert = JSON.parse(JSON.stringify(prev));
-            newAlert.isAlert = true;
-            newAlert.msg = "Device permission is required to sign up";
-            newAlert.alertType = "error";
-            return newAlert;
-          });
-        } else {
-          await signUp(email.current.value, username.current.value, pass.current.value);
-        }
+        await signUp(email.current.value, username.current.value, pass.current.value);
       })();
     } else {
       console.log('Your passwords are not the same');
