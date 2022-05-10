@@ -30,7 +30,7 @@ import rightside4 from '../../resources/rightside-4.png';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { getDatabase, ref, onValue  } from 'firebase/database';
-import { signal, enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
+import { enterLobby, exitLobby, getLobby, getUsername, updatePlayer } from '../../endpoints';
 
 
 const DELTA = 1;
