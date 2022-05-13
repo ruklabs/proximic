@@ -4,3 +4,5 @@ This is a course requirements for CS191/192 Software Engineering Courses of the 
 Nakano, Ryosuke
 Negrido, Uriel
 Quirapas, Kristian
+
+![Screenshot of Lobby](./src/resources/screenie.png)

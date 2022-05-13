@@ -16,12 +16,10 @@ import rightside2 from '../../resources/rightside-2.png';
 import downside2 from '../../resources/down-2.png';
 import upside2 from '../../resources/up-2.png';
 
-
 import upside3 from '../../resources/up-3.png';
 import upside4 from '../../resources/up-4.png';
 import downside3 from '../../resources/down-3.png';
 import downside4 from '../../resources/down-4.png';
-
 
 import leftside3 from '../../resources/leftside-3.png'; 
 import rightside3 from '../../resources/rightside-3.png';
@@ -40,7 +38,7 @@ const BORDER_CEIL = 90;
 
 let AGORAUID;
 
-const ACTIVE_DIST= 10;
+const ACTIVE_DIST= 15;
 
 const distance = (x1, y1, x2, y2) => {
   const sum = Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2);

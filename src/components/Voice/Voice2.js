@@ -123,15 +123,12 @@ export const handleUserLeft = async (user) => {
 }; 
 
 export const leaveAndRemoveLocalStream = async () => {
+  client.leave();
   localTrack.stop();
   localTrack.close();
 };
 
 export default function Voice2({ user }) {
-  const map = () => {
-    luidToAuid[user.uid] = uid;
-  };
-
   return (
     <StyledAnchor></StyledAnchor>
   );
